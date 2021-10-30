@@ -2,7 +2,7 @@
     --offwhite: #c6c6c6;
     --dark: #121212;
     --accent: #b51212;
-    --lin-grad-1: linear-gradient(to right bottom, #bb1500, #d42368, #be60b7, #8c90e2, #6cb2e7);
+    --lin-grad-1: #bb1500, #d42368, #be60b7, #8c90e2, #6cb2e7;
 }
 
 html {
@@ -22,4 +22,8 @@ body {
 
 #svelte {
     display: flow-root;
+}
+
+em {
+    font-family: 'Montserrat Alternates', sans-serif;
 }
