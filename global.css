@@ -1,5 +1,5 @@
 :root {
-    --offwhite: #c6c6c6;
+    --offwhite: #e6e6e6;
     --dark: #121212;
     --accent: #b51212;
     --lin-grad-1: #bb1500, #d42368, #be60b7, #8c90e2, #6cb2e7;
@@ -26,4 +26,25 @@ body {
 
 em {
     font-family: 'Montserrat Alternates', sans-serif;
+}
+
+.blur {
+    transition: filter 0.3s ease-in-out;
+    filter: blur(5px);
+}
+
+hr {
+    color: #67676732;
+    background-color: #67676732;
+    border-bottom: none;
+    width: 90%;
+    margin: 3% auto;
+}
+
+input, select, textarea {
+    color: black;
+}
+
+input::placeholder, select::placeholder, textarea::placeholder {
+    color: black;
 }
