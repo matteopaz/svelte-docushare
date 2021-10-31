@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Navigation from '$lib/Navigation.svelte';
-	import Counter from '$lib/Counter.svelte';
 	import caret from '/caret.svg';
 	import { onMount } from 'svelte';
 	import Modal from '$lib/Modal.svelte';
@@ -10,6 +9,14 @@
 		login: false,
 		signup: false
 	};
+	let signup = {
+		email: '',
+		password: '',
+	}
+	let login = {
+		email: '',
+		password: '',
+	}
 	async function handleLogout() {
 		return null;
 	}
@@ -41,7 +48,7 @@
 				<h3>User Panel</h3>
 				<hr />
 				<ol class="doclist">
-					{#if !loggedIn}
+					{#if !$loggedIn}
 						<li class="denied">You must be logged in to view recent documents</li>
 					{:else}
 						{#each documents as doc}
@@ -62,13 +69,14 @@
 		<form class="auth-form" on:submit|preventDefault={null}>
 			<label for="email"
 				><span>Email</span>
-				<input type="email" name="email" />
+				<input type="email" name="email" bind:value={signup.email} />
 			</label>
 			<label for="password"
 				><span>Password</span>
-				<input type="password" name="password" />
+				<input type="password" name="password" bind:value={signup.password} />
 			</label>
 			<input type="submit" value="Create Account" />
+			<p class="status"></p>
 		</form>
 	</Modal>
 {/if}
@@ -77,13 +85,14 @@
 		<form class="auth-form" on:submit|preventDefault={null}>
 			<label for="email"
 				><span>Email</span>
-				<input type="email" name="email" />
+				<input type="email" name="email" bind:value={login.email} />
 			</label>
 			<label for="password"
 				><span>Password</span>
-				<input type="password" name="password" />
+				<input type="password" name="password" bind:value={login.password} />
 			</label>
 			<input type="submit" value="Log in" />
+			<p class="status"></p>
 		</form>
 	</Modal>
 {/if}
@@ -244,6 +253,8 @@
 			list-style-type: none;
 			font-family: 'Montserrat Alternates', sans-serif;
 			font-size: clamp(1.25rem, 2vw, 2.25rem);
+			margin: 1rem auto;
+			width: max-content;
 		}
 	}
 
@@ -280,7 +291,7 @@
 				margin: 1rem 0;
 				width: 100%;
 				font-size: 2rem;
-				padding-left: 2ch;
+				padding-left: 0.5rem;
 				font-family: 'Montserrat Alternates', sans-serif;
 			}
 			input {
@@ -302,4 +313,6 @@
 			margin: 0 auto;
 		}
 	}
+
+
 </style>
