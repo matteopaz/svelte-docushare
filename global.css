@@ -1,50 +1,64 @@
 :root {
-    --offwhite: #e6e6e6;
-    --dark: #121212;
-    --accent: #b51212;
-    --lin-grad-1: #bb1500, #d42368, #be60b7, #8c90e2, #6cb2e7;
+	--offwhite: #e6e6e6;
+	--dark: #121212;
+	--accent: #b51212;
+	--lin-grad-1: #bb1500, #d42368, #be60b7, #8c90e2, #6cb2e7;
 }
 
 html {
-    font-size: 62.5%;
+	font-size: 62.5%;
 }
 
 body {
-    font-size: 16px;
-    margin: 0;
+	font-size: 16px;
+	margin: 0;
+	background-color: #e5e5e5;
+	font-family: 'Inter', sans-serif;
 }
 
 *,
- ::before,
- ::after {
-    box-sizing: border-box;
+::before,
+::after {
+	box-sizing: border-box;
 }
 
 #svelte {
-    display: flow-root;
+	display: flow-root;
 }
 
 em {
-    font-family: 'Montserrat Alternates', sans-serif;
+	font-family: 'Montserrat Alternates', sans-serif;
 }
 
 .blur {
-    transition: filter 0.3s ease-in-out;
-    filter: blur(5px);
+	transition: filter 0.3s ease-in-out;
+	filter: blur(5px);
+}
+
+.knockout {
+	background: linear-gradient(to top right, var(--lin-grad-1));
+	background-clip: text;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	font-family: 'Montserrat Alternates', sans-serif;
 }
 
 hr {
-    color: #67676732;
-    background-color: #67676732;
-    border-bottom: none;
-    width: 90%;
-    margin: 3% auto;
+	color: #67676732;
+	background-color: #67676732;
+	border-bottom: none;
+	width: 90%;
+	margin: 3% auto;
 }
 
-input, select, textarea {
-    color: black;
+input,
+select,
+textarea {
+	color: black;
 }
 
-input::placeholder, select::placeholder, textarea::placeholder {
-    color: black;
+input::placeholder,
+select::placeholder,
+textarea::placeholder {
+	color: black;
 }

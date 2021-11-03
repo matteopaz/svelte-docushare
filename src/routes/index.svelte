@@ -1,3 +1,22 @@
+<!-- <script lang="ts" context="module">
+	type PageState = 'Default' | 'Signup' | 'Login';
+	export async function load({ page }) {
+		if(page.query.has('login')) {
+			return {
+				params: {
+					pageState: 'Login'
+				}
+			}
+		} else if(page.query.has('signup')) {
+			return {
+				params: {
+					pageState: 'Signup'
+				}
+			}
+		}
+	}
+</script> -->
+
 <script lang="ts">
 	import { API_URL } from '$lib/global.d';
 	import { jwt, loggedIn, user } from '$lib/stores';
@@ -5,6 +24,10 @@
 	import caret from '/caret.svg';
 	import { onMount } from 'svelte';
 	import Modal from '$lib/Modal.svelte';
+	type PageState = 'Default' | 'Signup' | 'Login';
+	export let pageState: PageState = 'Default';
+	console.log(pageState);
+	
 	let loaded = false;
 	let modalActive = {
 		login: false,
@@ -23,7 +46,9 @@
 		error: false
 	};
 	function handleLogout() {
-		return null;
+		user.invalidate();
+		jwt.invalidate();
+		loggedIn.set(false);
 	}
 	async function handleLogin() {
 		login.status = '';
@@ -127,7 +152,7 @@
 />
 <main class:blur={modalActive.signup || modalActive.login}>
 	<section class="hero-container">
-		<h1 class="hero" class:unload={!loaded}>
+		<h1 class="hero knockout" class:unload={!loaded}>
 			Svelte <br /> Docushare <img src={caret} alt="Caret" class="caret" />
 		</h1>
 		<h2 class="hero">Document sharing and editing platform - A SvelteKit Demo</h2>
@@ -137,9 +162,9 @@
 				<h3>User Panel</h3>
 				<hr />
 				<ol class="doclist">
-					{#if !$loggedIn}
+					{#if $loggedIn === false}
 						<li class="denied">You must be logged in to view recent documents</li>
-					{:else}
+					{:else if $loggedIn === true}
 						{#each documents as doc}
 							<li>
 								<a href="/" class="document-title">{doc.title}</a>
@@ -147,6 +172,8 @@
 								<span class="date"><span class="small">Viewed: </span>{doc.lastviewed}</span>
 							</li>
 						{/each}
+					{:else}
+						<li class="denied">Loading...</li>
 					{/if}
 				</ol>
 			</div>
@@ -187,10 +214,6 @@
 {/if}
 
 <style lang="scss">
-	:global(body) {
-		background-color: #e5e5e5;
-		font-family: 'Inter', sans-serif;
-	}
 	.stripe {
 		&.unload {
 			bottom: 120%;
@@ -230,10 +253,6 @@
 		margin-top: 0;
 		margin-bottom: 0;
 		margin-right: 5rem;
-		background: linear-gradient(to top right, var(--lin-grad-1));
-		background-clip: text;
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
 		transition: all 0.4s ease;
 		opacity: 1;
 		&.unload {

@@ -25,11 +25,12 @@ function localstorageSynced(name: string, initialValue: any) {
 			set(value);
 		},
 		invalidate: () => {
+			localStorage.removeItem(name);
 			set(initialValue);
 		}
 	};
 }
 
-export const loggedIn = writable(false);
+export const loggedIn = writable(null);
 export const user = localstorageSynced('user', '');
 export const jwt = localstorageSynced('jwt', '');

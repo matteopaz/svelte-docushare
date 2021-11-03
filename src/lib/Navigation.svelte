@@ -9,7 +9,7 @@
 	<a href="/" class="navitem">Home</a>
 	<a href="/" class="navitem">Create new document</a>
 	{#if $loggedIn}
-		<a href="/" class="navitem">Library</a>
+		<a href="/library.svelte" class="navitem">Library</a>
 		<a href="/" class="navitem" on:click={() => dispatch('logout')}>Log out</a>
 	{:else}
 		<a href="/" class="navitem" on:click={() => dispatch('login')}>Log in</a>
