@@ -1,9 +1,10 @@
 <script lang="ts">
+	import { API_URL } from '$lib/global.d';
+	import { jwt, loggedIn, user } from '$lib/stores';
 	import Navigation from '$lib/Navigation.svelte';
 	import caret from '/caret.svg';
 	import { onMount } from 'svelte';
 	import Modal from '$lib/Modal.svelte';
-	import { loggedIn } from '$lib/stores';
 	let loaded = false;
 	let modalActive = {
 		login: false,
@@ -12,22 +13,110 @@
 	let signup = {
 		email: '',
 		password: '',
-	}
+		status: '',
+		error: false
+	};
 	let login = {
 		email: '',
 		password: '',
-	}
-	async function handleLogout() {
+		status: '',
+		error: false
+	};
+	function handleLogout() {
 		return null;
+	}
+	async function handleLogin() {
+		login.status = '';
+		login.error = false;
+		if (login.email.length <= 0 || login.password.length <= 0) {
+			login.status = 'Please fill in all fields';
+			login.error = true;
+			return;
+		}
+		const fetcher = await fetch(`${API_URL}/auth/login`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				email: login.email,
+				password: login.password
+			})
+		});
+		if (fetcher.status === 200) {
+			jwt.set(await fetcher.text());
+			user.set(login.email);
+			loggedIn.set(true);
+			modalActive.login = false;
+		} else {
+			login.status = await fetcher.text();
+			login.error = true;
+		}
 	}
 	const documents = Array(8).fill({
 		title: 'The coodsaffffffffffoo asdf sadf sada fsdasf d',
 		createdat: '2020-01-01',
 		lastviewed: '2020-01-01'
 	});
-	onMount(() => {
+	onMount(async () => {
 		loaded = true;
+		const authFetch = await fetch(`${API_URL}/auth/check`, {
+			method: 'GET',
+			headers: {
+				Authorization: `Bearer ${$jwt}`
+			}
+		});
+		if (authFetch.ok) {
+			loggedIn.set(true);
+		} else {
+			loggedIn.set(false);
+			user.invalidate();
+			jwt.invalidate();
+		}
 	});
+
+	async function handleSignin() {
+		signup.status = '';
+		signup.error = false;
+		if (signup.email.length <= 0 || signup.password.length <= 0) {
+			signup.status = 'Please fill in all fields';
+			signup.error = true;
+			return;
+		}
+		const getPasswordStrength = (pass: string): number => {
+			const length_one = pass.length > 8 ? 1 : 0;
+			const length_two = pass.length > 12 ? 1 : 0;
+			const lowercase = pass.match(/[a-z]/) ? 1 : 0;
+			const capital = pass.match(/[A-Z]/) ? 1 : 0;
+			const numbers = pass.match(/[0-9]/) ? 1 : 0;
+			const nonAlphas = pass.match(/[^a-zA-Z\d\s:]/) ? 1 : 0;
+			return length_one + length_two + lowercase + capital + numbers + nonAlphas;
+		};
+		const strength = getPasswordStrength(signup.password);
+		if (strength < 4) {
+			signup.error = true;
+			signup.status =
+				'Please create a stronger password, use uppercase, numbers, non-alphanumerics or increase length';
+		} else {
+			const fetcher = await fetch(`${API_URL}/auth/signup`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					email: signup.email,
+					password: signup.password
+				})
+			});
+			const res = fetcher;
+			if (res.status === 200) {
+				signup.status = `${await res.text()}, you may now log in.`;
+			} else {
+				signup.error = true;
+				signup.status = await res.text();
+			}
+		}
+	}
 </script>
 
 <Navigation
@@ -66,7 +155,7 @@
 </main>
 {#if modalActive.signup}
 	<Modal on:close={() => (modalActive.signup = false)} title="Sign Up">
-		<form class="auth-form" on:submit|preventDefault={null}>
+		<form class="auth-form" on:submit|preventDefault={handleSignin}>
 			<label for="email"
 				><span>Email</span>
 				<input type="email" name="email" bind:value={signup.email} />
@@ -76,13 +165,13 @@
 				<input type="password" name="password" bind:value={signup.password} />
 			</label>
 			<input type="submit" value="Create Account" />
-			<p class="status"></p>
+			<p class="status" class:error={signup.error}>{signup.status}</p>
 		</form>
 	</Modal>
 {/if}
 {#if modalActive.login}
 	<Modal on:close={() => (modalActive.login = false)} title="Login">
-		<form class="auth-form" on:submit|preventDefault={null}>
+		<form class="auth-form" on:submit|preventDefault={handleLogin}>
 			<label for="email"
 				><span>Email</span>
 				<input type="email" name="email" bind:value={login.email} />
@@ -92,7 +181,7 @@
 				<input type="password" name="password" bind:value={login.password} />
 			</label>
 			<input type="submit" value="Log in" />
-			<p class="status"></p>
+			<p class="status" class:error={login.error}>{login.status}</p>
 		</form>
 	</Modal>
 {/if}
@@ -104,7 +193,7 @@
 	}
 	.stripe {
 		&.unload {
-			bottom: 120vh;
+			bottom: 120%;
 		}
 		transition: all 0.4s ease;
 		width: 35rem;
@@ -252,9 +341,9 @@
 		li.denied {
 			list-style-type: none;
 			font-family: 'Montserrat Alternates', sans-serif;
-			font-size: clamp(1.25rem, 2vw, 2.25rem);
+			font-size: clamp(1.75rem, 1.25vw, 2.25rem);
 			margin: 1rem auto;
-			width: max-content;
+			text-align: center;
 		}
 	}
 
@@ -296,7 +385,14 @@
 			}
 			input {
 				width: 100%;
-				background: linear-gradient(to right, #bb150032, #d4236832, #be60b732, #8c90e232, #6cb2e732);
+				background: linear-gradient(
+					to right,
+					#bb150032,
+					#d4236832,
+					#be60b732,
+					#8c90e232,
+					#6cb2e732
+				);
 
 				border: rgba(var(--txt), 0.33);
 				padding: 0.75rem 2rem;
@@ -305,14 +401,31 @@
 			}
 		}
 
-		input[type="submit"] {
+		.status {
+			font-size: clamp(1rem, 1.25vw, 2rem);
+			text-align: center;
+			color: green;
+			display: block;
+			width: 100%;
+			font-weight: lighter;
+			font-style: italic;
+		}
+		.error {
+			color: red;
+		}
+
+		input[type='submit'] {
 			border: 0.1rem solid var(--dark);
 			padding: 0.5rem 1rem;
 			border-radius: 100vw;
 			background-color: none;
 			margin: 0 auto;
+			cursor: pointer;
+			&:hover {
+				transition: background-color 0.3s ease, color 0.3s ease;
+				background-color: var(--dark);
+				color: white;
+			}
 		}
 	}
-
-
 </style>
