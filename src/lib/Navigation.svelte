@@ -3,23 +3,27 @@
 	import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
 	export let blur = false;
+	export let page = 'not index';
 </script>
 
 <nav class:blur>
-	<a href="/" class="navitem">Home</a>
-	<a href="/" class="navitem">Create new document</a>
+	<a href="/" class="navitem left">Home</a>
+	{#if page === 'index'}
+		{#if !$loggedIn}
+			<a href="/" class="navitem" on:click={() => dispatch('login')}>Log in</a>
+			<a href="/" class="navitem" on:click={() => dispatch('signup')}>Sign up</a>
+		{/if}
+	{/if}
 	{#if $loggedIn}
-		<a href="/library.svelte" class="navitem">Library</a>
-		<a href="/" class="navitem" on:click={() => dispatch('logout')}>Log out</a>
-	{:else}
-		<a href="/" class="navitem" on:click={() => dispatch('login')}>Log in</a>
-		<a href="/" class="navitem" on:click={() => dispatch('signup')}>Sign up</a>
+	<a href="/" class="navitem">Create new document</a>
+	<a href="/library" class="navitem">Library</a>
+	<a href="/" class="navitem" on:click={() => dispatch('logout')}>Log out</a>
 	{/if}
 </nav>
 
 <style lang="scss">
 	nav {
-		height: 4rem;
+		height: var(--nav-height);
 		border-bottom: 0.125rem solid #67676732;
 		display: flex;
 		align-items: center;
@@ -56,5 +60,9 @@
 			border-radius: 0.35rem;
 			transform: scale(1.2);
 		}
+	}
+
+	.left {
+		justify-self: flex-start;
 	}
 </style>

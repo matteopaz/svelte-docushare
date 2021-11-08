@@ -1,89 +1,49 @@
-<!-- <script lang="ts" context="module">
-	type PageState = 'Default' | 'Signup' | 'Login';
-	export async function load({ page }) {
-		if(page.query.has('login')) {
-			return {
-				params: {
-					pageState: 'Login'
-				}
-			}
-		} else if(page.query.has('signup')) {
-			return {
-				params: {
-					pageState: 'Signup'
-				}
-			}
-		}
-	}
-</script> -->
-
 <script lang="ts">
-	import { API_URL } from '$lib/global.d';
+	import { API_URL } from '../global.d';
 	import { jwt, loggedIn, user } from '$lib/stores';
 	import Navigation from '$lib/Navigation.svelte';
-	import caret from '/caret.svg';
 	import { onMount } from 'svelte';
 	import Modal from '$lib/Modal.svelte';
-	type PageState = 'Default' | 'Signup' | 'Login';
-	export let pageState: PageState = 'Default';
-	console.log(pageState);
-	
+	import Typewriter from 'tinywriter';
+	import handleLogout from '$lib/hooks/auth/handleLogout';
+	import LogIn from '$lib/hooks/auth/handleLogin';
+	import SignIn from '$lib/hooks/auth/handleSignin';
+	import type { AuthenticationForm } from 'src/global';
 	let loaded = false;
 	let modalActive = {
 		login: false,
 		signup: false
 	};
-	let signup = {
+	let signup: AuthenticationForm = {
 		email: '',
 		password: '',
 		status: '',
 		error: false
 	};
-	let login = {
+	let login: AuthenticationForm = {
 		email: '',
 		password: '',
 		status: '',
 		error: false
 	};
-	function handleLogout() {
-		user.invalidate();
-		jwt.invalidate();
-		loggedIn.set(false);
-	}
-	async function handleLogin() {
-		login.status = '';
-		login.error = false;
-		if (login.email.length <= 0 || login.password.length <= 0) {
-			login.status = 'Please fill in all fields';
-			login.error = true;
-			return;
-		}
-		const fetcher = await fetch(`${API_URL}/auth/login`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				email: login.email,
-				password: login.password
-			})
-		});
-		if (fetcher.status === 200) {
-			jwt.set(await fetcher.text());
-			user.set(login.email);
-			loggedIn.set(true);
-			modalActive.login = false;
-		} else {
-			login.status = await fetcher.text();
-			login.error = true;
-		}
-	}
 	const documents = Array(8).fill({
-		title: 'The coodsaffffffffffoo asdf sadf sada fsdasf d',
+		title: 'Lorem Ipsum Dolor Sit',
 		createdat: '2020-01-01',
 		lastviewed: '2020-01-01'
 	});
+	let header: HTMLElement;
 	onMount(async () => {
+		const writer = new Typewriter(header, 195, '|');
+		writer
+			.init()
+			.defineLoopStart()
+			.write('Svelte')
+			.put('<br />', 'html')
+			.write('Docushare')
+			.wait(19000)
+			.delete(true)
+			.wait(1100)
+			.defineLoopEnd();
 		loaded = true;
 		const authFetch = await fetch(`${API_URL}/auth/check`, {
 			method: 'GET',
@@ -99,48 +59,13 @@
 			jwt.invalidate();
 		}
 	});
-
+	async function handleLogin() {
+		modalActive.login = await LogIn(login)
+		login = login;
+	}
 	async function handleSignin() {
-		signup.status = '';
-		signup.error = false;
-		if (signup.email.length <= 0 || signup.password.length <= 0) {
-			signup.status = 'Please fill in all fields';
-			signup.error = true;
-			return;
-		}
-		const getPasswordStrength = (pass: string): number => {
-			const length_one = pass.length > 8 ? 1 : 0;
-			const length_two = pass.length > 12 ? 1 : 0;
-			const lowercase = pass.match(/[a-z]/) ? 1 : 0;
-			const capital = pass.match(/[A-Z]/) ? 1 : 0;
-			const numbers = pass.match(/[0-9]/) ? 1 : 0;
-			const nonAlphas = pass.match(/[^a-zA-Z\d\s:]/) ? 1 : 0;
-			return length_one + length_two + lowercase + capital + numbers + nonAlphas;
-		};
-		const strength = getPasswordStrength(signup.password);
-		if (strength < 4) {
-			signup.error = true;
-			signup.status =
-				'Please create a stronger password, use uppercase, numbers, non-alphanumerics or increase length';
-		} else {
-			const fetcher = await fetch(`${API_URL}/auth/signup`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					email: signup.email,
-					password: signup.password
-				})
-			});
-			const res = fetcher;
-			if (res.status === 200) {
-				signup.status = `${await res.text()}, you may now log in.`;
-			} else {
-				signup.error = true;
-				signup.status = await res.text();
-			}
-		}
+		await SignIn(signup);
+		signup = signup;
 	}
 </script>
 
@@ -149,11 +74,13 @@
 	on:login={() => (modalActive.login = true)}
 	on:logout={handleLogout}
 	blur={modalActive.signup || modalActive.login}
+	page="index"
 />
 <main class:blur={modalActive.signup || modalActive.login}>
 	<section class="hero-container">
 		<h1 class="hero knockout" class:unload={!loaded}>
-			Svelte <br /> Docushare <img src={caret} alt="Caret" class="caret" />
+		<span bind:this={header}></span>
+		<span class="placeholder">Svelte Docushare</span>
 		</h1>
 		<h2 class="hero">Document sharing and editing platform - A SvelteKit Demo</h2>
 		<div class="stripe" class:unload={!loaded} />
@@ -236,7 +163,7 @@
 		position: relative;
 		padding: 5rem;
 		overflow: hidden;
-		min-height: calc(100vh - 4rem);
+		min-height: var(--page-height);
 	}
 	.hero {
 		--txt: 100, 100, 100;
@@ -245,35 +172,24 @@
 		font-family: 'Montserrat Alternates', sans-serif;
 	}
 	h1.hero {
+		overflow: visible;
+		position: relative;
 		color: black;
-		font-size: min(13.5vw, 14.5rem);
+		font-size: min(9.5vw, 14.5rem);
 		font-weight: bold;
-		width: minmax(min-content, max-content);
+		width: 60vw;
+		min-height: calc(2 * min(12vw, 17rem));
 		float: left;
 		margin-top: 0;
 		margin-bottom: 0;
 		margin-right: 5rem;
 		transition: all 0.4s ease;
 		opacity: 1;
+		.placeholder {
+			display: none;
+		}
 		&.unload {
 			opacity: 0;
-		}
-		.caret {
-			transform: translateX(-65%) translateY(15%);
-			height: 0.85em;
-			display: inline;
-			animation: blink 1.5s steps(1, start) infinite;
-		}
-		@keyframes blink {
-			0% {
-				opacity: 0;
-			}
-			50% {
-				opacity: 1;
-			}
-			100% {
-				opacity: 0;
-			}
 		}
 	}
 	h2.hero {

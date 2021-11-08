@@ -1,6 +1,6 @@
 import preprocess from 'svelte-preprocess';
 import adapterCFW from '@sveltejs/adapter-cloudflare-workers';
-import { defineConfig } from 'vite';
+import { defineConfig, searchForWorkspaceRoot } from 'vite';
 
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -24,6 +24,11 @@ const config = {
                         port: 3000,
                         host: "localhost",
                         open: true
+                    },
+                    fs: {
+                        allow: [
+                            searchForWorkspaceRoot(process.cwd())
+                        ]
                     }
                 }
             })
