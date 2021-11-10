@@ -29,7 +29,7 @@
 
 <style lang="scss">
     .main-container {
-        max-width: max(70rem, 55vw);
+        max-width: max(60rem, 45vw);
         box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
         margin: 0 auto;
         background-color: var(--offwhite);
