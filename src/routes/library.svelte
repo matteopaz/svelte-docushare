@@ -1,7 +1,7 @@
 <script lang="ts">
   import { loggedIn, user, jwt } from '$lib/stores';
   import Navigation from '$lib/Navigation.svelte';
-	const documents = Array(8).fill({
+	const documents = Array(15).fill({
 		title: 'Lorem Ipsum Dolor Sit',
 		createdat: '2020-01-01',
 		lastviewed: '2020-01-01'
