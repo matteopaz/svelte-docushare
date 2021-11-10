@@ -45,7 +45,7 @@
 			.wait(1100)
 			.defineLoopEnd();
 		loaded = true;
-		const authFetch = await fetch(`${API_URL}/auth/check`, {
+		const authFetch = await fetch(`${API_URL}/auth/check`, { // TODO - add auth to a cookie and a JWT and use load
 			method: 'GET',
 			headers: {
 				Authorization: `Bearer ${$jwt}`
