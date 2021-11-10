@@ -1,14 +1,13 @@
 <script lang="ts">
-import { ESTALE } from "constants";
     export let documents = Array(18).fill({
 		title: 'Lorem Ipsum Dolor Sit',
 		createdat: '2020-01-01',
 		lastviewed: '2020-01-01'
 	});
-	export let listlength = 10;
+	export let listlength = 999;
 	export let spacing  = 1;
 	export let denied: Boolean = true;
-	export let maxh = 20;
+	export let maxh = 10000;
 	documents = documents.slice(0, listlength);
 </script>
 
@@ -16,7 +15,7 @@ import { ESTALE } from "constants";
 	{#if !denied}
         {#each documents as doc}
             <li style="padding-top: {spacing}rem; padding-bottom: {spacing}rem;">
-                <a href="/" class="document-title">{doc.title}</a>
+                <a href="/view/{doc.hash}" class="document-title">{doc.title}</a>
                 <span class="date"><span class="small">Created: </span>{doc.createdat}</span>
                 <span class="date"><span class="small">Viewed: </span>{doc.lastviewed}</span>
             </li>

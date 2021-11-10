@@ -1,6 +1,3 @@
-<script lang=ts>
-</script>
-
 <div class="wrapper">
     <h1 class="knockout">Viewpage not found!</h1>
     <p>Your URL may be invalid, it should end in /view/[identifier]</p>

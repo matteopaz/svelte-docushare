@@ -1,11 +1,19 @@
 <script lang="ts">
+  import checkAuth from '$lib/hooks/auth/checkAuth';
   import { loggedIn, user, jwt } from '$lib/stores';
   import Navigation from '$lib/Navigation.svelte';
-	const documents = Array(15).fill({
+  import Doclist from '$lib/Doclist.svelte';
+import { onMount } from 'svelte';
+	const documents = Array(105).fill({
 		title: 'Lorem Ipsum Dolor Sit',
 		createdat: '2020-01-01',
-		lastviewed: '2020-01-01'
+		lastviewed: '2020-01-01',
+    hash: "none"
 	});
+
+  onMount(() => {
+    checkAuth(jwt, loggedIn, user);
+  })
 </script>
 
 <Navigation />
@@ -13,17 +21,11 @@
   {#if $loggedIn}
   <h1>Your Documents - {$user}</h1>
   <hr />
-  <ul class="document_list">
-    {#each documents as doc}
-    <li class="document_list-item">
-      <a href="/" class="document-title">{doc.title}</a>
-      <span class="date"><span class="small">Created: </span>{doc.createdat}</span>
-      <span class="date"><span class="small">Viewed: </span>{doc.lastviewed}</span>
-    </li>
-  {/each}
-  </ul>
-  {:else}
+  <Doclist documents={documents} spacing={1.5} denied={!$loggedIn} />
+  {:else if $loggedIn === false}
     <h1>Please <a href="/">Log in!</a></h1>
+  {:else}
+    <h1>Loading...</h1>
   {/if}
 </section>
 
@@ -33,7 +35,7 @@
         box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
         margin: 0 auto;
         background-color: var(--offwhite);
-        height: var(--page-height);
+        min-height: var(--page-height);
         padding: clamp(3rem, 4vw, 4.5rem);
         &.center {
           display: grid;
@@ -58,21 +60,5 @@
     hr {
       margin-top: 3.25rem;
       margin-bottom: 3.25rem;
-    }
-
-    .document_list {
-      display: flex;
-      flex-flow: column nowrap;
-      justify-content: space-evenly;
-      align-items: stretch;
-      list-style-type: none;
-      text-align: center;
-      padding: 0;
-      height: 85%;
-    }
-
-    .document_list-item {
-      display: flex;
-      justify-content: space-between;
     }
 </style>

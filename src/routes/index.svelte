@@ -6,10 +6,12 @@
 	import Modal from '$lib/Modal.svelte';
 	import Typewriter from 'tinywriter';
 	import handleLogout from '$lib/hooks/auth/handleLogout';
+	import checkAuth from '$lib/hooks/auth/checkAuth';
 	import LogIn from '$lib/hooks/auth/handleLogin';
 	import SignIn from '$lib/hooks/auth/handleSignin';
 	import type { AuthenticationForm } from 'src/global';
 	import Doclist from '$lib/Doclist.svelte';
+import { log } from 'console';
 	let loaded = false;
 	let modalActive = {
 		login: false,
@@ -46,19 +48,7 @@
 			.wait(1100)
 			.defineLoopEnd();
 		loaded = true;
-		const authFetch = await fetch(`${API_URL}/auth/check`, { // TODO - add auth to a cookie and a JWT and use load
-			method: 'GET',
-			headers: {
-				Authorization: `Bearer ${$jwt}`
-			}
-		});
-		if (authFetch.ok) {
-			loggedIn.set(true);
-		} else {
-			loggedIn.set(false);
-			user.invalidate();
-			jwt.invalidate();
-		}
+		checkAuth(jwt, loggedIn, user);
 	});
 	async function handleLogin() {
 		modalActive.login = await LogIn(login)
