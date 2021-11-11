@@ -11,7 +11,6 @@
 	import SignIn from '$lib/hooks/auth/handleSignin';
 	import type { AuthenticationForm } from 'src/global';
 	import Doclist from '$lib/Doclist.svelte';
-import { log } from 'console';
 	let loaded = false;
 	let modalActive = {
 		login: false,

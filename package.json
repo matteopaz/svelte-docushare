@@ -36,7 +36,6 @@
     },
     "type": "module",
     "dependencies": {
-        "gfm.css": "^1.1.2",
         "normalize.css": "^8.0.1",
         "remarkable": "^2.0.1",
         "sanitize-html": "^2.5.3",
