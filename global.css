@@ -28,10 +28,6 @@ body {
     display: flow-root;
 }
 
-em {
-    font-family: 'Montserrat Alternates', sans-serif;
-}
-
 .blur {
     transition: filter 0.3s ease-in-out;
     filter: blur(5px);

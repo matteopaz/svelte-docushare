@@ -13,7 +13,8 @@
 		} else {
 			return {
 				props: {
-					content: "# Header *emphasis* ~~strikethrough~~"
+					content: `# Hello world \n *Emphasized* ~~strikethrough~~ _italic_ **Bold**
+					`
 				}
 			};
 		}
@@ -21,20 +22,26 @@
 </script>
 
 <script lang="ts">
+	import 'gfm.css';
 	import Navigation from '$lib/Navigation.svelte';
-    import DOMPurify from 'dompurify';
-    import { marked } from 'marked';
-	import { onMount } from 'svelte';
+	import sanitizeHtml from 'sanitize-html';
+	import { Remarkable } from 'remarkable';
 	export let content: string;
-
-    const renderedContent = marked.parse(content);
-    const sanitizedContent = DOMPurify.sanitize(renderedContent);
-    console.log(sanitizedContent);
+	const md = new Remarkable({
+		xhtmlOut: true,
+		breaks: true
+	});
+	const renderedContent = md.render(content);
+	const safeContent = sanitizeHtml(renderedContent);
 </script>
+
+<svelte:head>
+	<link href="https://fonts.googleapis.com/css2?family=Arimo&display=swap" rel="stylesheet" />
+</svelte:head>
 
 <Navigation />
 <section class="main-container">
-{@html sanitizedContent}
+	{@html safeContent}
 </section>
 
 <style lang="scss">
@@ -45,5 +52,7 @@
 		background-color: var(--offwhite);
 		min-height: var(--page-height);
 		padding: clamp(3rem, 4vw, 4.5rem);
+		font-family: 'Arimo', sans-serif;
+		font-size: clamp(1.75rem, calc(28 * calc(100vw / 1920)), 2.75rem); // In px
 	}
 </style>

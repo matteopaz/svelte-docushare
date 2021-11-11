@@ -40,9 +40,9 @@ import { log } from 'console';
 		writer
 			.init()
 			.defineLoopStart()
-			.write('Svelte')
-			.put('<br />', 'html')
 			.write('Docushare')
+			.put('<br />', 'html')
+			.write('Lite')
 			.wait(19000)
 			.delete(true)
 			.wait(1100)
@@ -71,9 +71,9 @@ import { log } from 'console';
 	<section class="hero-container">
 		<h1 class="hero knockout" class:unload={!loaded}>
 		<span bind:this={header}></span>
-		<span class="placeholder">Svelte Docushare</span>
+		<span class="placeholder">Docushare Lite</span>
 		</h1>
-		<h2 class="hero">Document sharing and editing platform - A SvelteKit Demo</h2>
+		<h2 class="hero">Markdown and text document sharing platform. Create, share and manage files for free, hosted online.</h2>
 		<div class="stripe" class:unload={!loaded} />
 		<div class="utilities-container">
 			<div class="card panel">

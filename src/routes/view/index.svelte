@@ -1,3 +1,4 @@
+<a href="/">Home</a>
 <div class="wrapper">
     <h1 class="knockout">Viewpage not found!</h1>
     <p>Your URL may be invalid, it should end in /view/[identifier]</p>
@@ -20,5 +21,14 @@
     p {
         margin-bottom: 10rem;
         font-size: 1.5rem;
+    }
+
+    a {
+        display: block;
+        color: blue;
+        width: max-content;
+        margin: 3rem auto;
+        margin-bottom: 0;
+        letter-spacing: 0.065rem;
     }
 </style>
