@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { loggedIn } from '$lib/stores';
 	import { createEventDispatcher } from 'svelte';
+	import handleLogout from './hooks/auth/handleLogout';
 	const dispatch = createEventDispatcher();
 	export let blur = false;
 	export let page = 'not index';
@@ -15,9 +16,9 @@
 		{/if}
 	{/if}
 	{#if $loggedIn}
-	<a href="/" class="navitem">Create new document</a>
-	<a href="/library" class="navitem">Library</a>
-	<a href="/" class="navitem" on:click={() => dispatch('logout')}>Log out</a>
+		<a href="/" class="navitem">Create new document</a>
+		<a href="/library" class="navitem">Library</a>
+		<a href="/" class="navitem" on:click={handleLogout}>Log out</a>
 	{/if}
 </nav>
 

@@ -62,7 +62,6 @@
 <Navigation
 	on:signup={() => (modalActive.signup = true)}
 	on:login={() => (modalActive.login = true)}
-	on:logout={handleLogout}
 	blur={modalActive.signup || modalActive.login}
 	page="index"
 />
