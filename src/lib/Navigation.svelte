@@ -16,7 +16,7 @@
 		{/if}
 	{/if}
 	{#if $loggedIn}
-		<a href="/" class="navitem">Create new document</a>
+		<a href="/edit" class="navitem">Create new document</a>
 		<a href="/library" class="navitem">Library</a>
 		<a href="/" class="navitem" on:click={handleLogout}>Log out</a>
 	{/if}
