@@ -1,18 +1,23 @@
 <script lang="ts" context="module">
-	// export async function load({fetch, page}) {
-	// 	if(page.params.has("")) {
-
-	// 	}
-	// }
+	// @ts-expect-error
+	import { API_URL } from '/src/global.d';
+	export async function load({ fetch, page }) {
+		const hash = page.params.hash;
+		return {
+			props: {
+				hash
+			}
+		};
+	}
 </script>
 
 <script lang="ts">
 	export const ssr = false;
-
 	import Navigation from '$lib/Navigation.svelte';
 	import { onMount } from 'svelte';
+	export let hash = '';
 	onMount(async () => {
-		let iv = "";
+		let iv = '';
 		try {
 			const Editor = (await import('@toast-ui/editor')).default;
 			const editor = new Editor({
@@ -23,14 +28,14 @@
 				previewHighlight: false,
 				autofocus: true
 			});
-		} catch(e) {}
-
+		} catch (e) {}
 	});
 </script>
 
 <Navigation />
 <svelte:head>
 	<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+	<title>{hash}</title>
 </svelte:head>
 
 <section class="main-wrapper">
@@ -750,7 +755,6 @@
 			}
 		</style>
 	</div>
-
 </section>
 
 <style lang="scss">

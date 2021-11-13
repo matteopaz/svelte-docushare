@@ -22,10 +22,10 @@
 				user: $user
 			})
 		});
-		const res = await fetcher.json();
-		if (res.ok && res.hash) {
+		if (fetcher.ok) {
+			const res = await fetcher.json();
 			setTimeout(() => {
-				goto(`/edit/${res.hash}`);
+				goto(`/edit/${res.__hash}`);
 			}, 300);
 		} else {
 			status = {

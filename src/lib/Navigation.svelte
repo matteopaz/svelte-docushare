@@ -9,11 +9,9 @@
 
 <nav class:blur>
 	<a href="/" class="navitem left">Home</a>
-	{#if page === 'index'}
-		{#if !$loggedIn}
+	{#if page === 'index' && !$loggedIn}
 			<a href="/" class="navitem" on:click={() => dispatch('login')}>Log in</a>
 			<a href="/" class="navitem" on:click={() => dispatch('signup')}>Sign up</a>
-		{/if}
 	{/if}
 	{#if $loggedIn}
 		<a href="/new-doc" class="navitem">Create new document</a>
