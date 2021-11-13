@@ -1,9 +1,18 @@
+<script lang="ts" context="module">
+	// export async function load({fetch, page}) {
+	// 	if(page.params.has("")) {
+
+	// 	}
+	// }
+</script>
+
 <script lang="ts">
 	export const ssr = false;
 
 	import Navigation from '$lib/Navigation.svelte';
 	import { onMount } from 'svelte';
 	onMount(async () => {
+		let iv = "";
 		try {
 			const Editor = (await import('@toast-ui/editor')).default;
 			const editor = new Editor({
