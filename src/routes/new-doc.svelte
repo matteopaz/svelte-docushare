@@ -28,6 +28,7 @@
 				goto(`/edit/${res.__hash}`);
 			}, 300);
 		} else {
+			console.error(fetcher.statusText);
 			status = {
 				text: 'Error creating new document. Try logging back in or reloading.',
 				error: true
