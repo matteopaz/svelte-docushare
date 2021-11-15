@@ -17,6 +17,36 @@
 	import { jwt } from '$lib/stores';
 	import debounce from '$lib/debouncer';
 	export let hash = '';
+	let editor;
+	let save = () => {
+		const content = editor.getMarkdown();
+		localStorage.setItem(
+			'doc-cache',
+			JSON.stringify({
+				hash,
+				content
+			})
+		);
+		console.log('Saved locally.');
+	};
+	let apiSave = () => {
+		const content = editor.getMarkdown();
+		fetch(`${API_URL}/save/${hash}`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${$jwt}`
+			},
+			body: content
+		});
+		console.log('Saved to cloud.');
+	};
+	const debouncedSave = debounce(save, 5000);
+	const debouncedApiSave = debounce(apiSave, 30000);
+	const changeAction = () => {
+		debouncedSave();
+		debouncedApiSave();
+	};
 	onMount(async () => {
 		const ls_data = JSON.parse(localStorage.getItem('doc-cache'));
 		let initialValue = '';
@@ -29,10 +59,11 @@
 				}
 			});
 			const document = await fetched_data.json();
+			console.log(document, fetched_data);
 			initialValue = document.content;
 		}
 		const Editor = (await import('@toast-ui/editor')).default;
-		const editor = new Editor({
+		editor = new Editor({
 			el: document.getElementById('editor'),
 			previewStyle: 'vertical',
 			height: 'max(80vh, 50rem)',
@@ -41,33 +72,7 @@
 			autofocus: true,
 			initialValue
 		});
-		const apiSave = debounce(() => {
-			if (document.hasFocus()) {
-				const content = editor.getMarkdown();
-				fetch(`${API_URL}/save/${hash}`, {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-						Authorization: `Bearer ${$jwt}`
-					},
-					body: content
-				});
-				console.log('Saved to cloud.');
-			}
-		}, 35000);
-		const save = debounce(() => {
-			const content = editor.getMarkdown();
-			localStorage.setItem(
-				'doc-cache',
-				JSON.stringify({
-					hash,
-					content
-				})
-			);
-			apiSave();
-			console.log('Saved locally.');
-		}, 2000);
-		editor.addHook('keydown', save);
+		editor.addHook('keydown', changeAction);
 	});
 </script>
 
@@ -77,6 +82,9 @@
 </svelte:head>
 
 <section class="main-wrapper">
+	<div class="control-bar">
+		<button class="save" on:click={() => {save();apiSave();}}>Save Document</button>
+	</div>
 	<style>
 		* a {
 			color: #4183c4;
@@ -789,11 +797,10 @@
 			width: max-content;
 		}
 	</style>
-	<div id="editor" spellcheck="false">
-	</div>
+	<div id="editor" spellcheck="false" />
 </section>
-<style lang="scss">
 
+<style lang="scss">
 	.main-wrapper {
 		padding: 5rem 10rem;
 	}
