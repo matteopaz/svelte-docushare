@@ -1,5 +1,5 @@
 /// <reference types="@sveltejs/kit" />
-export const API_URL = `http://localhost:8010/proxy`;
+export const API_URL = `http://127.0.0.1:8787`;
 export interface AuthenticationForm {
     email: string,
     password: string,

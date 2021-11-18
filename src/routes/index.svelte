@@ -59,6 +59,8 @@
 	}
 </script>
 
+<svelte:head><title>Docushare</title></svelte:head>
+
 <Navigation
 	on:signup={() => (modalActive.signup = true)}
 	on:login={() => (modalActive.login = true)}

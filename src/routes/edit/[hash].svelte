@@ -1,6 +1,7 @@
 <script lang="ts" context="module">
 	export async function load({ fetch, page }) {
 		const hash = page.params.hash;
+		// Put document request here after TODO move jwt to httponly cookie
 		return {
 			props: {
 				hash
@@ -17,16 +18,15 @@
 	import { jwt } from '$lib/stores';
 	import debounce from '$lib/debouncer';
 	export let hash = '';
+	let doc = {
+		content: '',
+		title: 'Untitled Dsdfssocument',
+		editors: []
+	};
 	let editor;
 	let save = () => {
 		const content = editor.getMarkdown();
-		localStorage.setItem(
-			'doc-cache',
-			JSON.stringify({
-				hash,
-				content
-			})
-		);
+		localStorage.setItem('doc-cache', JSON.stringify(doc));
 		console.log('Saved locally.');
 	};
 	let apiSave = () => {
@@ -37,7 +37,7 @@
 				'Content-Type': 'application/json',
 				Authorization: `Bearer ${$jwt}`
 			},
-			body: content
+			body: JSON.stringify(doc)
 		});
 		console.log('Saved to cloud.');
 	};
@@ -48,19 +48,20 @@
 		debouncedApiSave();
 	};
 	onMount(async () => {
+		const fetched_data = await fetch(`${API_URL}/edit/${hash}`, {
+			headers: {
+				Authorization: `Bearer ${$jwt}`
+			}
+		});
+		const cloud_document = await fetched_data.json();
+		doc.editors = cloud_document.editors;
+		doc.title = cloud_document.title;
 		const ls_data = JSON.parse(localStorage.getItem('doc-cache'));
 		let initialValue = '';
 		if (ls_data && ls_data.hash === hash) {
 			initialValue = ls_data.content;
 		} else {
-			const fetched_data = await fetch(`${API_URL}/edit/${hash}`, {
-				headers: {
-					Authorization: `Bearer ${$jwt}`
-				}
-			});
-			const document = await fetched_data.json();
-			console.log(document, fetched_data);
-			initialValue = document.content;
+			initialValue = cloud_document.content;
 		}
 		const Editor = (await import('@toast-ui/editor')).default;
 		editor = new Editor({
@@ -78,12 +79,18 @@
 
 <Navigation />
 <svelte:head>
-	<title>{hash}</title>
+	<title>{doc.title}</title>
 </svelte:head>
 
 <section class="main-wrapper">
 	<div class="control-bar">
-		<button class="save" on:click={() => {save();apiSave();}}>Save Document</button>
+		<button
+			class="save"
+			on:click={() => {
+				save();
+				apiSave();
+			}}>Save Document</button
+		>
 	</div>
 	<style>
 		* a {
