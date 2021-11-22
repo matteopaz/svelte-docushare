@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { API_URL } from '../global.d';
-	import { jwt, loggedIn, user } from '$lib/stores';
+	import { jwt, loggedIn, user, title } from '$lib/stores';
 	import Navigation from '$lib/Navigation.svelte';
 	import { onMount } from 'svelte';
 	import Modal from '$lib/Modal.svelte';
@@ -11,6 +11,7 @@
 	import SignIn from '$lib/hooks/auth/handleSignin';
 	import type { AuthenticationForm } from 'src/global';
 	import Doclist from '$lib/Doclist.svelte';
+	title.set('Docushare');
 	let loaded = false;
 	let modalActive = {
 		login: false,
@@ -28,11 +29,7 @@
 		status: '',
 		error: false
 	};
-	const documents = Array(8).fill({
-		title: 'Lorem Ipsum Dolor Sit',
-		createdat: '2020-01-01',
-		lastviewed: '2020-01-01'
-	});
+	let documents = [];
 	let header: HTMLElement;
 	onMount(async () => {
 		const writer = new Typewriter(header, 195, '|');
@@ -47,10 +44,23 @@
 			.wait(1100)
 			.defineLoopEnd();
 		loaded = true;
-		checkAuth(jwt, loggedIn, user);
+		await checkAuth(jwt, loggedIn, user);
+		if ($loggedIn) {
+			const fetcher = await fetch(`${API_URL}/user-docs/10`, {
+				headers: {
+					Authorization: `Bearer ${$jwt}`
+				}
+			});
+			if(fetcher.ok) {
+				documents = await fetcher.json();
+				console.log(documents);
+			} else {
+				console.warn('Failed to fetch user docs');
+			}
+		}
 	});
 	async function handleLogin() {
-		modalActive.login = await LogIn(login)
+		modalActive.login = await LogIn(login);
 		login = login;
 	}
 	async function handleSignin() {
@@ -58,8 +68,6 @@
 		signup = signup;
 	}
 </script>
-
-<svelte:head><title>Docushare</title></svelte:head>
 
 <Navigation
 	on:signup={() => (modalActive.signup = true)}
@@ -70,16 +78,19 @@
 <main class:blur={modalActive.signup || modalActive.login}>
 	<section class="hero-container">
 		<h1 class="hero knockout" class:unload={!loaded}>
-		<span bind:this={header}></span>
-		<span class="placeholder">Docushare Lite</span>
+			<span bind:this={header} />
+			<span class="placeholder">Docushare Lite</span>
 		</h1>
-		<h2 class="hero">Markdown and text document sharing platform. Create, share and manage files for free, hosted online.</h2>
+		<h2 class="hero">
+			Markdown and text document sharing platform. Create, share and manage files for free, hosted
+			online.
+		</h2>
 		<div class="stripe" class:unload={!loaded} />
 		<div class="utilities-container">
 			<div class="card panel">
 				<h3>User Panel</h3>
 				<hr />
-				<Doclist documents={documents} denied={!$loggedIn} listlength={10} maxh={15} />
+				<Doclist {documents} denied={!$loggedIn} listlength={10} maxh={15} />
 			</div>
 		</div>
 	</section>

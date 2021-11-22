@@ -4,8 +4,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { API_URL } from '/src/global.d';
-	import { jwt, loggedIn, user } from '$lib/stores';
+	import { jwt, loggedIn, user, title } from '$lib/stores';
 	import { goto } from '$app/navigation';
+	title.set('Creating Doc...');
 	let status = {
 		text: 'Creating new document...',
 		error: false
@@ -28,9 +29,13 @@
 				goto(`/edit/${res.__hash}`);
 			}, 300);
 		} else {
+			let text =  'Error creating new document. Try logging back in or reloading.';
+			if(fetcher.status === 405) {
+				text = await fetcher.text();
+			}
 			console.error(fetcher.statusText);
 			status = {
-				text: 'Error creating new document. Try logging back in or reloading.',
+				text,
 				error: true
 			};
 		}

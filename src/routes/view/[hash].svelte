@@ -3,29 +3,36 @@
 	import { API_URL } from '/src/global.d';
 	export async function load({ page, fetch }) {
 		const hash = page.params.hash;
-		const res: Response = await fetch(`${API_URL}/view/${hash}`);
-		if (res.ok) {
+		const fetcher: Response = await fetch(`${API_URL}/view/${hash}`);
+		if (fetcher.ok) {
+			const res = await fetcher.json();
 			return {
 				props: {
-					content: await res.text()
+					content: res.content,
+					title: res.title,
+					created: res.created
 				}
 			};
 		} else {
-			return {
-				props: {
-					content: `# Hello world \n *Emphasized* ~~strikethrough~~ _italic_ **Bold**
-					`
-				}
-			};
+			return;
 		}
 	}
 </script>
 
 <script lang="ts">
 	import Navigation from '$lib/Navigation.svelte';
+	import { title as HeadTitle } from "$lib/stores";
 	import sanitizeHtml from 'sanitize-html';
 	import { Remarkable } from 'remarkable';
 	export let content: string;
+	export let title: string;
+	export let created: Date;
+	HeadTitle.set(title);
+	const readableDate = created.toLocaleString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric'
+	});
 	const md = new Remarkable({
 		xhtmlOut: true,
 		breaks: true
@@ -33,6 +40,10 @@
 	const renderedContent = md.render(content);
 	const safeContent = sanitizeHtml(renderedContent);
 </script>
+
+<svelte:head>
+	<title>{title}</title>
+</svelte:head>
 
 <Navigation />
 <section class="main-container">

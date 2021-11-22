@@ -1,9 +1,5 @@
 <script lang="ts">
-    export let documents = Array(18).fill({
-		title: 'Lorem Ipsum Dolor Sit',
-		createdat: '2020-01-01',
-		lastviewed: '2020-01-01'
-	});
+    export let documents: {hash: string, title: string, owned: string, created: string}[];
 	export let listlength = 999;
 	export let spacing  = 1;
 	export let denied: Boolean = true;
@@ -13,13 +9,17 @@
 
 <ol class="doclist" style="max-height: {maxh}rem">
 	{#if !denied}
+	{#if documents.length > 0}
         {#each documents as doc}
             <li style="padding-top: {spacing}rem; padding-bottom: {spacing}rem;">
-                <a href="/view/{doc.hash}" class="document-title">{doc.title}</a>
-                <span class="date"><span class="small">Created: </span>{doc.createdat}</span>
-                <span class="date"><span class="small">Viewed: </span>{doc.lastviewed}</span>
+                <a href="/edit/{doc.hash}" class="document-title">{doc.title}</a>
+                <span class="statistic"><span class="small">Created: </span>{(new Date(doc.created)).toLocaleDateString()}</span>
+                <span class="statistic"><span class="small">Owned: </span>{doc.owned}</span>
             </li>
         {/each}
+	{:else}
+	  <li class="denied">Documents appear here. Make one!</li>
+	{/if}
 	{:else}
 		<li class="denied">Please log in to access!</li>
 	{/if}
@@ -52,9 +52,10 @@
 		}
 
 		li {
-			display: flex;
+			display: grid;
+			grid-template-columns: 5fr 3.5fr 5fr;
+			grid-template-rows: 1;
 			width: 100%;
-			justify-content: space-between;
 			padding-left: 1.25rem;
 			padding-right: 1.25rem;
 		}
@@ -68,10 +69,11 @@
 		}
 	}
 
-	.date {
+	.statistic {
 		color: #676767bb;
 		font-family: 'Montserrat Alternates', sans-serif;
 		margin: 0 0.5vw;
+		font-size: clamp(1rem, 1.15vw, 1.5rem);
 		.small {
 			font-size: 0.8em;
 			font-style: italic;

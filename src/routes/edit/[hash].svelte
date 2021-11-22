@@ -15,7 +15,7 @@
 	import { API_URL } from '/src/global.d';
 	import Navigation from '$lib/Navigation.svelte';
 	import { onMount } from 'svelte';
-	import { jwt, user } from '$lib/stores';
+	import { jwt, title } from '$lib/stores';
 	import debounce from '$lib/debouncer';
 	import Modal from '$lib/Modal.svelte';
 	import { navigating, page } from '$app/stores';
@@ -62,7 +62,6 @@
 	const debouncedSave = debounce(save, 5000);
 	const debouncedApiSave = debounce(apiSave, 30000);
 	const changeAction = () => {
-		console.log('Change detected.');
 		savestate = 'Unsaved';
 		debouncedSave();
 		debouncedApiSave();
@@ -131,12 +130,12 @@
 			}
 		}
 	}
+	$: {
+		title.set(doc.title !== "" ? doc.title : "Document");
+	}
 </script>
 
 <Navigation blur={modalopen} />
-<svelte:head>
-	<title>{doc.title !== '' ? doc.title : 'Document'}</title>
-</svelte:head>
 
 <svelte:window on:beforeunload={handleClosing} />
 {#if allowed === "allowed"}

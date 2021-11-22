@@ -1,3 +1,8 @@
+<script lang="ts">
+    import { title } from "$lib/stores";
+    title.set("Document not found!");
+</script>
+
 <a href="/">Home</a>
 <div class="wrapper">
     <h1 class="knockout">Viewpage not found!</h1>
