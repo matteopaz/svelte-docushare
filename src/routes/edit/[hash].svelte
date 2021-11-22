@@ -15,19 +15,23 @@
 	import { API_URL } from '/src/global.d';
 	import Navigation from '$lib/Navigation.svelte';
 	import { onMount } from 'svelte';
-	import { jwt } from '$lib/stores';
+	import { jwt, user } from '$lib/stores';
 	import debounce from '$lib/debouncer';
 	import Modal from '$lib/Modal.svelte';
 	import { navigating, page } from '$app/stores';
-import { goto } from '$app/navigation';
+	import { goto } from '$app/navigation';
 	export let hash = '';
+	let allowed = "loading";
 	let doc = {
 		// Local working document state
 		content: '',
-		title: 'Untitled Dsdfssocument',
-		editors: []
+		title: 'Untitled Document',
+		editors: [],
+		viewed: 0,
+		owned: '',
+		created: new Date()
 	};
-	let savestate: 'Unsaved' | 'Saved locally' | 'Saved to cloud' = 'Unsaved';
+	let savestate: 'Unsaved' | 'Saved locally' | 'Saved to cloud' = 'Saved locally';
 	let editor;
 	let modalopen = false;
 	let save = () => {
@@ -69,9 +73,17 @@ import { goto } from '$app/navigation';
 				Authorization: `Bearer ${$jwt}`
 			}
 		});
+		if(fetched_data.ok) {
+			allowed = "allowed";
+		} else {
+			allowed = "denied";
+		}
 		const cloud_document = await fetched_data.json();
 		doc.editors = cloud_document.editors;
 		doc.title = cloud_document.title;
+		doc.viewed = cloud_document.viewed;
+		doc.owned = cloud_document.owned;
+		doc.created = new Date(cloud_document.created);
 		const ls_data = JSON.parse(localStorage.getItem('doc-cache'));
 		let initialValue = '';
 		if (ls_data && ls_data.hash === hash) {
@@ -98,13 +110,6 @@ import { goto } from '$app/navigation';
 		save();
 		apiSave();
 	}
-	let title = doc.title; // Workaround for mass reactivity to doc object
-	$: title = doc.title;
-	$: {
-		// Listens for changes to title
-		title = title;
-		changeAction();
-	}
 	function handleClosing(event) {
 		if (savestate === 'Unsaved') {
 			const warning = 'You have unsaved content, please save or you will lose it!';
@@ -116,10 +121,12 @@ import { goto } from '$app/navigation';
 	}
 	$: {
 		const nav = $navigating;
-		if(nav && savestate === 'Unsaved') {
+		if (nav && savestate === 'Unsaved') {
 			goto(`/edit/${hash}`);
-			const accepted = confirm('You have unsaved content, if you continue at this time you will lose it.');
-			if(accepted) {
+			const accepted = confirm(
+				'You have unsaved content, if you continue at this time you will lose it.'
+			);
+			if (accepted) {
 				goto(nav.to.path);
 			}
 		}
@@ -132,7 +139,7 @@ import { goto } from '$app/navigation';
 </svelte:head>
 
 <svelte:window on:beforeunload={handleClosing} />
-
+{#if allowed === "allowed"}
 <section class="main-wrapper" class:blur={modalopen}>
 	<div class="control-bar">
 		<button
@@ -150,13 +157,20 @@ import { goto } from '$app/navigation';
 		>
 		<label for="title"
 			>Title:
-			<input type="text" name="title" bind:value={doc.title} />
+			<input type="text" name="title" bind:value={doc.title} on:keydown={changeAction} />
 		</label>
 		<p class="info">
 			<span id="save-status">{savestate}</span>
-			<span class="statistic"> Owned by: a1@gmail.com </span>
-			<span class="statistic"> Viewed 10 times </span>
-			<span class="statistic"> Created: November 21, 2021 </span>
+			<span class="statistic"> Owned by: {doc.owned} </span>
+			<span class="statistic"> Viewed {doc.viewed} times </span>
+			<span class="statistic">
+				Created: {doc.created.toLocaleDateString('en-US', {
+					weekday: 'long',
+					day: 'numeric',
+					year: 'numeric',
+					month: 'long'
+				})}
+			</span>
 		</p>
 	</div>
 	<style>
@@ -893,8 +907,19 @@ import { goto } from '$app/navigation';
 		</form>
 	</Modal>
 {/if}
-
+{:else if allowed === "loading"}
+<div class="center">
+	<div class="loader"></div>
+</div>
+{:else}
+<div class="center">
+	<h1>You are not allowed to edit this document. Log in, or request the owner for access.</h1>
+</div>
+{/if}
 <style lang="scss">
+	.center {
+		height: var(--page-height);
+	}
 	.main-wrapper {
 		padding: 0 10rem;
 	}
@@ -1018,7 +1043,7 @@ import { goto } from '$app/navigation';
 		content: '';
 	}
 	.loader:after {
-		background: #0dc5c1;
+		background: var(--offwhite);
 		width: 75%;
 		height: 75%;
 		border-radius: 50%;

@@ -104,3 +104,8 @@ textarea::placeholder {
     border: 2px solid var(--dark);
     background-color: var(--offwhite);
 }
+
+.center {
+    display: grid;
+    place-items: center;
+}
