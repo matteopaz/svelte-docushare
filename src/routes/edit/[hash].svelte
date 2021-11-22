@@ -15,10 +15,11 @@
 	import { API_URL } from '/src/global.d';
 	import Navigation from '$lib/Navigation.svelte';
 	import { onMount } from 'svelte';
-	import { jwt, title } from '$lib/stores';
+	import { jwt, title, user, loggedIn } from '$lib/stores';
+	import checkAuth from '$lib/hooks/auth/checkAuth';
 	import debounce from '$lib/debouncer';
 	import Modal from '$lib/Modal.svelte';
-	import { navigating, page } from '$app/stores';
+	import { navigating } from '$app/stores';
 	import { goto } from '$app/navigation';
 	export let hash = '';
 	let allowed = "loading";
@@ -67,6 +68,7 @@
 		debouncedApiSave();
 	};
 	onMount(async () => {
+		await checkAuth(jwt, loggedIn, user);
 		const fetched_data = await fetch(`${API_URL}/edit/${hash}`, {
 			headers: {
 				Authorization: `Bearer ${$jwt}`

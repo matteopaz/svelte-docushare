@@ -4,8 +4,7 @@
 	import Navigation from '$lib/Navigation.svelte';
 	import { onMount } from 'svelte';
 	import Modal from '$lib/Modal.svelte';
-	import Typewriter from 'tinywriter';
-	import handleLogout from '$lib/hooks/auth/handleLogout';
+	import Typewriter from 'tinywriter'
 	import checkAuth from '$lib/hooks/auth/checkAuth';
 	import LogIn from '$lib/hooks/auth/handleLogin';
 	import SignIn from '$lib/hooks/auth/handleSignin';
