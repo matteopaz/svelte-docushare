@@ -17,20 +17,33 @@
 	import { onMount } from 'svelte';
 	import { jwt } from '$lib/stores';
 	import debounce from '$lib/debouncer';
+	import Modal from '$lib/Modal.svelte';
+	import { navigating, page } from '$app/stores';
+import { goto } from '$app/navigation';
 	export let hash = '';
 	let doc = {
+		// Local working document state
 		content: '',
 		title: 'Untitled Dsdfssocument',
 		editors: []
 	};
+	let savestate: 'Unsaved' | 'Saved locally' | 'Saved to cloud' = 'Unsaved';
 	let editor;
+	let modalopen = false;
 	let save = () => {
+		// Local save function
+		if (!editor) return;
 		const content = editor.getMarkdown();
+		doc.content = content;
 		localStorage.setItem('doc-cache', JSON.stringify(doc));
+		savestate = 'Saved locally';
 		console.log('Saved locally.');
 	};
 	let apiSave = () => {
+		// Cloud save function
+		if (!editor) return;
 		const content = editor.getMarkdown();
+		doc.content = content;
 		fetch(`${API_URL}/save/${hash}`, {
 			method: 'POST',
 			headers: {
@@ -39,11 +52,14 @@
 			},
 			body: JSON.stringify(doc)
 		});
+		savestate = 'Saved to cloud';
 		console.log('Saved to cloud.');
 	};
 	const debouncedSave = debounce(save, 5000);
 	const debouncedApiSave = debounce(apiSave, 30000);
 	const changeAction = () => {
+		console.log('Change detected.');
+		savestate = 'Unsaved';
 		debouncedSave();
 		debouncedApiSave();
 	};
@@ -67,7 +83,7 @@
 		editor = new Editor({
 			el: document.getElementById('editor'),
 			previewStyle: 'vertical',
-			height: 'max(80vh, 50rem)',
+			height: 'max(75vh, 50rem)',
 			initialEditType: 'markdown',
 			previewHighlight: false,
 			autofocus: true,
@@ -75,22 +91,73 @@
 		});
 		editor.addHook('keydown', changeAction);
 	});
+	let neweditor = '';
+	function addEditor(editor: string) {
+		neweditor = '';
+		doc.editors = [editor, ...doc.editors];
+		save();
+		apiSave();
+	}
+	let title = doc.title; // Workaround for mass reactivity to doc object
+	$: title = doc.title;
+	$: {
+		// Listens for changes to title
+		title = title;
+		changeAction();
+	}
+	function handleClosing(event) {
+		if (savestate === 'Unsaved') {
+			const warning = 'You have unsaved content, please save or you will lose it!';
+			event.returnValue = warning;
+			return warning;
+		} else {
+			return true;
+		}
+	}
+	$: {
+		const nav = $navigating;
+		if(nav && savestate === 'Unsaved') {
+			goto(`/edit/${hash}`);
+			const accepted = confirm('You have unsaved content, if you continue at this time you will lose it.');
+			if(accepted) {
+				goto(nav.to.path);
+			}
+		}
+	}
 </script>
 
-<Navigation />
+<Navigation blur={modalopen} />
 <svelte:head>
-	<title>{doc.title}</title>
+	<title>{doc.title !== '' ? doc.title : 'Document'}</title>
 </svelte:head>
 
-<section class="main-wrapper">
+<svelte:window on:beforeunload={handleClosing} />
+
+<section class="main-wrapper" class:blur={modalopen}>
 	<div class="control-bar">
 		<button
-			class="save"
+			class="btn btn-secondary"
 			on:click={() => {
 				save();
 				apiSave();
 			}}>Save Document</button
 		>
+		<button
+			class="btn btn-secondary"
+			on:click={() => {
+				modalopen = true;
+			}}>Change Editors</button
+		>
+		<label for="title"
+			>Title:
+			<input type="text" name="title" bind:value={doc.title} />
+		</label>
+		<p class="info">
+			<span id="save-status">{savestate}</span>
+			<span class="statistic"> Owned by: a1@gmail.com </span>
+			<span class="statistic"> Viewed 10 times </span>
+			<span class="statistic"> Created: November 21, 2021 </span>
+		</p>
 	</div>
 	<style>
 		* a {
@@ -806,14 +873,118 @@
 	</style>
 	<div id="editor" spellcheck="false" />
 </section>
+{#if modalopen}
+	<Modal
+		title="Editors"
+		on:close={() => {
+			modalopen = false;
+		}}
+	>
+		<form on:submit|preventDefault class="change-editors">
+			<label for="email">
+				<input type="email" placeholder="example@email.com" bind:value={neweditor} />
+				<button class="btn btn-secondary" on:click={() => addEditor(neweditor)}>Add</button>
+			</label>
+			<ul class="existing-editors">
+				{#each doc.editors as editor}
+					<li>{editor}</li>
+				{/each}
+			</ul>
+		</form>
+	</Modal>
+{/if}
 
 <style lang="scss">
 	.main-wrapper {
-		padding: 5rem 10rem;
+		padding: 0 10rem;
+	}
+	input {
+		border: 1px solid var(--dark);
+		padding: 0.75rem;
+		letter-spacing: 110%;
+		font-family: 'Montserrat Alternates', sans-serif;
+		&::placeholder {
+			opacity: 0.5;
+		}
+	}
+	.control-bar {
+		display: flex;
+		justify-content: space-evenly;
+		align-items: center;
+		min-height: 8rem;
+		label {
+			width: 20%;
+			font-size: clamp(1rem, 1vw, 1.5rem);
+			text-align: center;
+		}
+		input {
+			border-radius: 0.35rem;
+			margin-left: 1rem;
+			width: max(5rem, 70%);
+			font-weight: bold;
+		}
+	}
+
+	.info > * {
+		margin: 0 clamp(0.75rem, 1.25rem, 0.75vw);
+		font-style: italic;
+		opacity: 0.8;
+		font-size: clamp(0.8rem, 0.8vw, 1.5rem);
+		&::after {
+			content: '/';
+			position: absolute;
+			transform: translateX(clamp(0.75rem, 1.25rem, 0.75vw)) translateY(0.1rem);
+		}
+	}
+
+	#save-status {
+		border-bottom: 1px solid black;
+		margin-bottom: -2px; // To bring the entire element down to center align
 	}
 
 	#editor {
 		background-color: white;
+	}
+
+	form.change-editors {
+		padding: 0 5rem;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex-flow: column;
+		label * {
+			height: 4rem;
+			line-height: 0;
+		}
+	}
+
+	.existing-editors {
+		list-style: none;
+		padding: 1rem 2rem;
+		margin: 2rem;
+		// border-top: 2px solid #23232332;
+		// border-bottom: 2px solid #23232332;
+		max-height: 30rem;
+		overflow: auto;
+		li {
+			margin: 0.75rem 0;
+		}
+		scrollbar-width: thin;
+		scrollbar-color: #e5e5e5 #be60b744;
+
+		&::-webkit-scrollbar {
+			width: 16px;
+		}
+
+		&::-webkit-scrollbar-track {
+			background-color: #be60b744;
+			border-radius: 1rem;
+		}
+
+		&::-webkit-scrollbar-thumb {
+			background-color: #e5e5e5;
+			border-radius: 1rem;
+		}
 	}
 
 	.loader {

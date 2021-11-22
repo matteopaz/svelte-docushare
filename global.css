@@ -1,7 +1,7 @@
 :root {
     --offwhite: #ddd;
     --dark: #121212;
-    --accent: #b51212;
+    --accent: #d46161;
     --lin-grad-1: #bb1500, #d42368, #be60b7, #8c90e2, #6cb2e7;
     --nav-height: 4rem;
     --page-height: calc(100vh - var(--nav-height));
@@ -78,4 +78,29 @@ input::placeholder,
 select::placeholder,
 textarea::placeholder {
     color: black;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.25rem;
+    font-size: clamp(1rem, 1.5rem, 1vw);
+    cursor: pointer;
+    transition: filter 90ms linear;
+}
+
+.btn:hover {
+    filter: invert(20%);
+}
+
+.btn-primary {
+    background-color: var(--accent);
+    color: white;
+    font-size: 1.75rem;
+}
+
+.btn-secondary {
+    border: 2px solid var(--dark);
+    background-color: var(--offwhite);
 }
