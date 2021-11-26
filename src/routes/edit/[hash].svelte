@@ -90,7 +90,7 @@
 		debouncedApiSave();
 	};
 	onMount(async () => {
-		const ls_data = JSON.parse(localStorage.getItem('doc-cache'));
+		const ls_data = JSON.parse(localStorage.getItem('doc-cache')); // TODO add lastedit metadata to all documents, and choose latest
 		let initialValue = '';
 		if (ls_data && ls_data.hash === hash) {
 			initialValue = ls_data.content;

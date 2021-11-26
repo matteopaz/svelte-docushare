@@ -35,7 +35,7 @@
 
 <style lang="scss">
 	.main-container {
-		max-width: max(60rem, 45vw);
+		max-width: max(80rem, 50vw);
 		box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
 		margin: 0 auto;
 		background-color: var(--offwhite);
