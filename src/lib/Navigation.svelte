@@ -1,19 +1,20 @@
 <script lang="ts">
-	import { loggedIn } from '$lib/stores';
+	import { session } from '$app/stores';
 	import { createEventDispatcher } from 'svelte';
 	import handleLogout from './hooks/auth/handleLogout';
 	const dispatch = createEventDispatcher();
+	const loggedIn = session
 	export let blur = false;
 	export let page = 'not index';
 </script>
 
 <nav class:blur>
 	<a href="/" class="navitem left">Home</a>
-	{#if page === 'index' && !$loggedIn}
+	{#if page === 'index' && !$session.loggedIn}
 			<a href="/" class="navitem" on:click={() => dispatch('login')}>Log in</a>
 			<a href="/" class="navitem" on:click={() => dispatch('signup')}>Sign up</a>
 	{/if}
-	{#if $loggedIn}
+	{#if $session.loggedIn}
 		<a href="/new-doc" class="navitem">Create new document</a>
 		<a href="/library" class="navitem">Library</a>
 		<a href="/" class="navitem" on:click={handleLogout}>Log out</a>

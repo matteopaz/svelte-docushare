@@ -30,8 +30,4 @@ function localstorageSynced(name: string, initialValue: any) {
 		}
 	};
 }
-
-export const loggedIn = writable(null);
-export const user = localstorageSynced('user', '');
-export const jwt = localstorageSynced('jwt', '');
 export const title = writable('');

@@ -1,15 +1,39 @@
-<script lang="ts">
+<script context="module" lang="ts">
 	import { API_URL } from '../global.d';
-	import { jwt, loggedIn, user, title } from '$lib/stores';
+	export async function load({ fetch, session }) {
+		let obj = {  
+			props: {
+				loggedIn: false,
+				documents: [],
+			}
+		};
+		if (session.loggedIn) {
+			const fetcher = await fetch(`${API_URL}/user-docs/10`, {
+				credentials: 'include'
+			});
+			if (fetcher.ok) {
+				obj.props.documents = await fetcher.json();
+				obj.props.loggedIn = true;
+			} else {
+				console.log('Failed to find user docs');
+			}
+		}
+		return obj;
+	}
+</script>
+
+<script lang="ts">
+	import { title } from '$lib/stores';
 	import Navigation from '$lib/Navigation.svelte';
 	import { onMount } from 'svelte';
 	import Modal from '$lib/Modal.svelte';
-	import Typewriter from 'tinywriter'
-	import checkAuth from '$lib/hooks/auth/checkAuth';
+	import Typewriter from 'tinywriter';
 	import LogIn from '$lib/hooks/auth/handleLogin';
 	import SignIn from '$lib/hooks/auth/handleSignin';
 	import type { AuthenticationForm } from 'src/global';
 	import Doclist from '$lib/Doclist.svelte';
+	export let documents = [];
+	export let loggedIn = false;
 	title.set('Docushare');
 	let loaded = false;
 	let modalActive = {
@@ -28,9 +52,8 @@
 		status: '',
 		error: false
 	};
-	let documents = [];
 	let header: HTMLElement;
-	onMount(async () => {
+	onMount(() => {
 		const writer = new Typewriter(header, 195, '|');
 		writer
 			.init()
@@ -43,20 +66,6 @@
 			.wait(1100)
 			.defineLoopEnd();
 		loaded = true;
-		await checkAuth(jwt, loggedIn, user);
-		if ($loggedIn) {
-			const fetcher = await fetch(`${API_URL}/user-docs/10`, {
-				headers: {
-					Authorization: `Bearer ${$jwt}`
-				}
-			});
-			if(fetcher.ok) {
-				documents = await fetcher.json();
-				console.log(documents);
-			} else {
-				console.warn('Failed to fetch user docs');
-			}
-		}
 	});
 	async function handleLogin() {
 		modalActive.login = await LogIn(login);
@@ -89,7 +98,7 @@
 			<div class="card panel">
 				<h3>User Panel</h3>
 				<hr />
-				<Doclist {documents} denied={!$loggedIn} listlength={10} maxh={15} />
+				<Doclist {documents} denied={!loggedIn} listlength={10} maxh={15} />
 			</div>
 		</div>
 	</section>

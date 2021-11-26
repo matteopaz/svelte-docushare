@@ -1,35 +1,35 @@
-<script lang="ts">
+<script context="module" lang="ts">
+	// @ts-expect-error
 	import { API_URL } from '/src/global.d';
-	import checkAuth from '$lib/hooks/auth/checkAuth';
-	import { loggedIn, user, jwt, title } from '$lib/stores';
+	export async function load({ fetch }) {
+		const fetched_documents = await fetch(`${API_URL}/user-docs/100`, {
+			credentials: 'include'
+		});
+		return {
+			props: {
+				documents: await fetched_documents.json()
+			}
+		};
+	}
+</script>
+
+<script lang="ts">
+	import { session } from '$app/stores';
+	import { title } from '$lib/stores';
 	import Navigation from '$lib/Navigation.svelte';
 	import Doclist from '$lib/Doclist.svelte';
-	import { onMount } from 'svelte';
-	let documents = [];
+	export let documents = [];
 	title.set('Library');
-	onMount(async () => {
-		await checkAuth(jwt, loggedIn, user);
-		if ($loggedIn) {
-			const fetched_documents = await fetch(`${API_URL}/user-docs/100`, {
-				headers: {
-					Authorization: `Bearer ${$jwt}`
-				}
-			});
-			documents = await fetched_documents.json();
-		}
-	});
 </script>
 
 <Navigation />
-<section class="main-container" class:center={!$loggedIn}>
-	{#if $loggedIn}
-		<h1>Your Documents - {$user}</h1>
+<section class="main-container" class:center={!$session.loggedIn}>
+	{#if $session.loggedIn}
+		<h1>Your Documents - {$session.user}</h1>
 		<hr />
-		<Doclist {documents} spacing={1.5} denied={!$loggedIn} />
-	{:else if $loggedIn === false}
-		<h1>Please <a href="/">Log in!</a></h1>
+		<Doclist {documents} spacing={1.5} denied={!$session.loggedIn} />
 	{:else}
-		<h1>Loading...</h1>
+		<h1>Please <a href="/">Log in!</a></h1>
 	{/if}
 </section>
 

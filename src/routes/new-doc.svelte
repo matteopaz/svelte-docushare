@@ -16,12 +16,11 @@
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				Authorization: `Bearer ${$jwt}`
 			},
 			body: JSON.stringify({
 				title: 'Untitled Doc',
-				user: $user
-			})
+			}),
+			credentials: 'include'
 		});
 		if (fetcher.ok) {
 			const res = await fetcher.json();

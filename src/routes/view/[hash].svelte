@@ -11,21 +11,23 @@
 					content: res.content,
 					title: res.title,
 					created: res.created
-				}
+				},
+				maxage: 60 * 60 * 24 * 1.5 // 36hr cache
 			};
 		} else {
-			return;
+			return {
+				redirect: '/view/',
+				status: 303
+			}
 		}
 	}
 </script>
 
 <script lang="ts">
 	import Navigation from '$lib/Navigation.svelte';
-	import { title as HeadTitle, jwt, user, loggedIn } from "$lib/stores";
-	import checkAuth from '$lib/hooks/auth/checkAuth';
+	import { title as HeadTitle } from "$lib/stores";
 	import sanitizeHtml from 'sanitize-html';
 	import { Remarkable } from 'remarkable';
-	import { onMount } from 'svelte';
 	export let content: string;
 	export let title: string;
 	export let created: Date;
@@ -41,9 +43,6 @@
 	});
 	const renderedContent = md.render(content);
 	const safeContent = sanitizeHtml(renderedContent);
-	onMount(() => {
-		checkAuth(jwt, loggedIn, user);
-	});
 </script>
 
 <svelte:head>

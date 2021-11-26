@@ -6,7 +6,7 @@
 <a href="/">Home</a>
 <div class="wrapper">
     <h1 class="knockout">Viewpage not found!</h1>
-    <p>Your URL may be invalid, it should end in /view/[identifier]</p>
+    <p>This document may not exist, or your URL may be invalid, it should end in /view/[identifier].</p>
 </div>
 
 <style lang="scss">
@@ -14,7 +14,7 @@
         display: flex;
         flex-flow: column nowrap;
         place-items: center;
-        min-height: 100vh;
+        height: calc(var(--page-height) - 15rem);
         justify-content: center;
         align-items: center;
     }
