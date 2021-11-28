@@ -4,7 +4,7 @@ import { defineConfig, searchForWorkspaceRoot } from 'vite';
 const viteConfig = defineConfig(() => {
     return {
         optimizeDeps: {
-            include: ["@toast-ui/editor"],
+            include: ["@toast-ui/editor"], // Probably not needed but if it aint broke DONT FIX IT
         },
         server: {
             hmr: {
@@ -37,8 +37,8 @@ const config = {
             esbuild: (options) => {
                 return {
                     ...options,
-                    external: ["./editor-675d6d07.js", "./editor*"],
-                    format: "esm"
+                    external: ["./editor-675d6d07.js", "./editor*"], // Theoretically all you need it the "./editor*", but I'm not touching this again
+                    format: "esm" // Also technically not needed, but I'm not touching this again
                 }
             }
         }),
