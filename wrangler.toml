@@ -1,11 +1,16 @@
-name = "sveltekit-workers-template"
-type = "webpack"
+name = "docushare-lite"
+type = "javascript"
 route = ''
 zone_id = ''
 usage_model = ''
 compatibility_flags = []
 workers_dev = true
 compatibility_date = "2021-10-03"
+[build]
+command = "npm run build"
+[build.upload]
+format = "service-worker"
+
 [site]
 bucket = './build'
 entry-point = './workers-site'

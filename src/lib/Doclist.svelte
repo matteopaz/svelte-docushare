@@ -1,4 +1,5 @@
 <script lang="ts">
+	// For some reason, this one in particular throws an unignorable error - Ignore it it works.
 	import { API_URL } from '/src/global.d';
 	export let documents: { hash: string; title: string; owned: string; created: string }[];
 	export let listlength = 999;

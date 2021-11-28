@@ -55,6 +55,7 @@
 		created: new Date()
 	};
 	let savestate: 'Unsaved' | 'Saved locally' | 'Saved to cloud' = 'Saved locally';
+	let EditorClass;
 	let editor;
 	let modalopen = false;
 	let save = () => {
@@ -99,8 +100,8 @@
 		} else {
 			initialValue = doc.content;
 		}
-		const Editor = (await import('@toast-ui/editor')).default;
-		editor = new Editor({
+		EditorClass = (await import('@toast-ui/editor')).default;
+		editor = new EditorClass({
 			el: document.getElementById('editor'),
 			previewStyle: 'vertical',
 			height: 'max(75vh, 50rem)',
