@@ -1,15 +1,26 @@
 <script context="module" lang="ts">
+	import { browser } from '$app/env';
 	// @ts-expect-error
 	import { API_URL } from '/src/global.d';
-	export async function load({ fetch }) {
-		const fetched_documents = await fetch(`${API_URL}/user-docs/100`, {
-			credentials: 'include'
-		});
-		return {
-			props: {
-				documents: await fetched_documents.json()
+	export async function load({ fetch, session }) {
+			const fetched_documents = await fetch(`${API_URL}/user-docs/100`, {
+				headers: {
+					Authentication: session.jwt
+				}
+			});
+			if (fetched_documents.ok && fetched_documents.json) {
+				return {
+					props: {
+						documents: await fetched_documents.json()
+					}
+				};
+			} else {
+				return {
+					props: {
+						documents: []
+					}
+				};
 			}
-		};
 	}
 </script>
 

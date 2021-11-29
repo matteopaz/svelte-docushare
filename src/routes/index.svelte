@@ -1,28 +1,27 @@
 <script context="module" lang="ts">
-	import { API_URL } from '../global.d';
 	export async function load({ fetch, session }) {
-		let obj = {  
-			props: {
-				loggedIn: false,
-				documents: [],
+		const fetcher = await fetch(`${API_URL}/user-docs/10`, {
+			headers: {
+				Authentication: session.jwt
 			}
-		};
-		if (session.loggedIn) {
-			const fetcher = await fetch(`${API_URL}/user-docs/10`, {
-				credentials: 'include'
-			});
-			if (fetcher.ok) {
-				obj.props.documents = await fetcher.json();
-				obj.props.loggedIn = true;
-			} else {
-				console.log('Failed to find user docs');
-			}
+		});
+		if (fetcher.ok) {
+			return {
+				props: {
+					documents: await fetcher.json()
+				}
+			};
+		} else {
+			console.warn('Failed to load user documents');
+			return {}
 		}
-		return obj;
 	}
 </script>
 
 <script lang="ts">
+	// @ts-ignore
+	import { API_URL } from '/src/global.d';
+	import { session } from '$app/stores';
 	import { title } from '$lib/stores';
 	import Navigation from '$lib/Navigation.svelte';
 	import { onMount } from 'svelte';
@@ -33,7 +32,6 @@
 	import type { AuthenticationForm } from 'src/global';
 	import Doclist from '$lib/Doclist.svelte';
 	export let documents = [];
-	export let loggedIn = false;
 	title.set('Docushare');
 	let loaded = false;
 	let modalActive = {
@@ -98,7 +96,7 @@
 			<div class="card panel">
 				<h3>User Panel</h3>
 				<hr />
-				<Doclist {documents} denied={!loggedIn} listlength={10} maxh={15} />
+				<Doclist {documents} denied={!$session.loggedIn} listlength={10} maxh={15} />
 			</div>
 		</div>
 	</section>

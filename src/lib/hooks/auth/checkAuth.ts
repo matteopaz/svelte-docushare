@@ -1,3 +1,4 @@
+// Deprecated
 // @ts-expect-error
 import { API_URL } from '/src/global.d';
 /**
@@ -15,7 +16,7 @@ async function checkAuth(jwt, loggedIn, user) {
 		// TODO - add auth to a cookie and a JWT and use load
 		method: 'GET',
 		headers: {
-			Authorization: `Bearer ${token}`
+			Authentication: `Bearer ${token}`
 		}
 	});
 	if (authFetch.ok) {

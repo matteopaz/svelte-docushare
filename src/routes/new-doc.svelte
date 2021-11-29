@@ -2,10 +2,10 @@
 </script>
 
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { API_URL } from '/src/global.d';
-	import { jwt, loggedIn, user, title } from '$lib/stores';
+	import { title } from '$lib/stores';
 	import { goto } from '$app/navigation';
+	import { session } from '$app/stores';
 	title.set('Creating Doc...');
 	let status = {
 		text: 'Creating new document...',
@@ -16,11 +16,11 @@
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
+				Authentication: $session.jwt
 			},
 			body: JSON.stringify({
-				title: 'Untitled Doc',
-			}),
-			credentials: 'include'
+				title: 'Untitled Doc'
+			})
 		});
 		if (fetcher.ok) {
 			const res = await fetcher.json();
@@ -28,8 +28,8 @@
 				goto(`/edit/${res.__hash}`);
 			}, 300);
 		} else {
-			let text =  'Error creating new document. Try logging back in or reloading.';
-			if(fetcher.status === 405) {
+			let text = 'Error creating new document. Try logging back in or reloading.';
+			if (fetcher.status === 405) {
 				text = await fetcher.text();
 			}
 			console.error(fetcher.statusText);

@@ -3,34 +3,36 @@
 	import { API_URL } from '/src/global.d';
 	export async function load({ fetch, page, session }) {
 		const hash = page.params.hash;
-		const fetched_data = await fetch(`${API_URL}/edit/${hash}`, {
-			credentials: 'include'
-		});
-		if (fetched_data.ok) {
-			const cloud_document = await fetched_data.json();
-			return {
-				props: {
-					allowed: "allowed",
-					hash,
-					doc: {
+			const fetched_data = await fetch(`${API_URL}/edit/${hash}`, {
+				headers: {
+					Authentication: session.jwt
+				}
+			});
+			if (fetched_data.ok) {
+				const cloud_document = await fetched_data.json();
+				return {
+					props: {
+						allowed: 'allowed',
 						hash,
-						content: cloud_document.content,
-						title: cloud_document.title,
-						editors: cloud_document.editors,
-						owned: cloud_document.owned,
-						created: new Date(cloud_document.created),
-						viewed: cloud_document.viewed
+						doc: {
+							hash,
+							content: cloud_document.content,
+							title: cloud_document.title,
+							editors: cloud_document.editors,
+							owned: cloud_document.owned,
+							created: new Date(cloud_document.created),
+							viewed: cloud_document.viewed
+						}
 					}
-				}
-			};
-		} else {
-			return {
-				props: {
-					allowed: "denied",
-					hash
-				}
+				};
+			} else {
+				return {
+					props: {
+						allowed: 'denied',
+						hash
+					}
+				};
 			}
-		}
 	}
 </script>
 
@@ -41,7 +43,7 @@
 	import { title } from '$lib/stores';
 	import debounce from '$lib/debouncer';
 	import Modal from '$lib/Modal.svelte';
-	import { navigating } from '$app/stores';
+	import { navigating, session } from '$app/stores';
 	import { goto } from '$app/navigation';
 	export let hash = '';
 	export let allowed: 'loading' | 'allowed' | 'denied' = 'loading';
@@ -75,9 +77,9 @@
 		fetch(`${API_URL}/save/${hash}`, {
 			method: 'POST',
 			headers: {
-				'Content-Type': 'application/json'
+				'Content-Type': 'application/json',
+				Authentication: $session.jwt
 			},
-			credentials: 'include',
 			body: JSON.stringify(doc)
 		});
 		savestate = 'Saved to cloud';

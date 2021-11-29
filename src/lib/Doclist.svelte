@@ -1,6 +1,7 @@
 <script lang="ts">
 	// For some reason, this one in particular throws an unignorable error - Ignore it it works.
 	import { API_URL } from '/src/global.d';
+	import { session } from '$app/stores';
 	export let documents: { hash: string; title: string; owned: string; created: string }[];
 	export let listlength = 999;
 	export let spacing = 1;
@@ -15,7 +16,9 @@
 		confirmstate = confirmstate;
 		const data = await fetch(`${API_URL}/delete-doc/${hash}`, {
 			method: 'DELETE',
-			credentials: 'include'
+			headers: {
+				Authentication: $session.jwt
+			}
 		});
 		if (!data.ok) {
 			console.error(await data.text());

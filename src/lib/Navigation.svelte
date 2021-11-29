@@ -3,7 +3,6 @@
 	import { createEventDispatcher } from 'svelte';
 	import handleLogout from './hooks/auth/handleLogout';
 	const dispatch = createEventDispatcher();
-	const loggedIn = session
 	export let blur = false;
 	export let page = 'not index';
 </script>
