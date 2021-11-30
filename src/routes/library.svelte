@@ -3,6 +3,7 @@
 	// @ts-expect-error
 	import { API_URL } from '/src/global.d';
 	export async function load({ fetch, session }) {
+		if (session.loggedIn) {
 			const fetched_documents = await fetch(`${API_URL}/user-docs/100`, {
 				headers: {
 					Authentication: session.jwt
@@ -15,12 +16,9 @@
 					}
 				};
 			} else {
-				return {
-					props: {
-						documents: []
-					}
-				};
+				return {};
 			}
+		}
 	}
 </script>
 

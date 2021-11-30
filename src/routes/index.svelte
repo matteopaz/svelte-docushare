@@ -1,26 +1,30 @@
 <script context="module" lang="ts">
+	// @ts-ignore
+	import { API_URL } from '/src/global.d';
 	export async function load({ fetch, session }) {
-		const fetcher = await fetch(`${API_URL}/user-docs/10`, {
-			headers: {
-				Authentication: session.jwt
-			}
-		});
-		if (fetcher.ok) {
-			return {
-				props: {
-					documents: await fetcher.json()
+		if (session.loggedIn) {
+			const fetcher = await fetch(`${API_URL}/user-docs/10`, {
+				headers: {
+					Authentication: session.jwt
 				}
-			};
+			});
+			if (fetcher.ok) {
+				return {
+					props: {
+						documents: await fetcher.json()
+					}
+				};
+			} else {
+				console.warn('Failed to load user documents');
+				return {};
+			}
 		} else {
-			console.warn('Failed to load user documents');
-			return {}
+			return {};
 		}
 	}
 </script>
 
 <script lang="ts">
-	// @ts-ignore
-	import { API_URL } from '/src/global.d';
 	import { session } from '$app/stores';
 	import { title } from '$lib/stores';
 	import Navigation from '$lib/Navigation.svelte';

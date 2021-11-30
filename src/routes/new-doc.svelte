@@ -1,7 +1,15 @@
 <script lang="ts" context="module">
+	export async function load({ session }) {
+		if(!session.loggedIn) {
+			return { redirect: "/", status: 302 };
+		} else {
+			return {};
+		}
+	}
 </script>
 
 <script lang="ts">
+	// @ts-ignore
 	import { API_URL } from '/src/global.d';
 	import { title } from '$lib/stores';
 	import { goto } from '$app/navigation';

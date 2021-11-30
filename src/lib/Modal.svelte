@@ -3,7 +3,7 @@
 	import { spring } from 'svelte/motion';
 	const dispatch = createEventDispatcher();
 	export let title = '';
-	const dist = spring(60, { stiffness: 0.08, damping: 0.2 });
+	const dist = spring(60, { stiffness: 0.12, damping: 0.22 });
 	onMount(() => {
 		dist.set(5);
 	});

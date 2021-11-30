@@ -3,6 +3,7 @@
 	import { API_URL } from '/src/global.d';
 	export async function load({ fetch, page, session }) {
 		const hash = page.params.hash;
+		if (session.loggedIn) {
 			const fetched_data = await fetch(`${API_URL}/edit/${hash}`, {
 				headers: {
 					Authentication: session.jwt
@@ -33,6 +34,14 @@
 					}
 				};
 			}
+		} else {
+			return {
+				props: {
+					allowed: 'denied',
+					hash
+				}
+			};
+		}
 	}
 </script>
 
