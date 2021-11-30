@@ -1,4 +1,6 @@
 import { API_URL } from './global.d';
+const AUTH_COOKIE_DOMAIN = '.matteodev.workers.dev'; // Switch if ever needed, based on the domain of the Auth cookie from the API
+
 function parseCookies(cookieString: string): { [key: string]: any } {
 	// Parse req.headers.cookie into an object
 	let cookies = {};
@@ -36,7 +38,7 @@ export async function handle({ request, resolve }) {
 			return {
 				...resolvedRequest,
 				headers: {
-					'set-cookie': ['Logout=no;Max-Age=0', 'Authentication=invalid;Max-Age=0'],
+					'set-cookie': ['Logout=no;Max-Age=0', 'Authentication=invalid;Max-Age=0;Domain=.matteodev.workers.dev;Path=/;'],
                     'content-type': 'text/html'
 				}
 			};
