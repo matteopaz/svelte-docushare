@@ -3,21 +3,21 @@
 	// @ts-expect-error
 	import { API_URL } from '/src/global.d';
 	export async function load({ fetch, session }) {
+		console.log(JSON.stringify(fetch, session));
+		if (fetch) {
+			console.log('fetch exists');
+		}
 		if (session.loggedIn) {
 			const fetched_documents = await fetch(`${API_URL}/user-docs/100`, {
 				headers: {
 					Authentication: session.jwt
 				}
 			});
-			if (fetched_documents.ok && fetched_documents.json) {
-				return {
-					props: {
-						documents: await fetched_documents.json()
-					}
-				};
-			} else {
-				return {};
-			}
+			return {
+				props: {
+					documents: await fetched_documents.json()
+				}
+			};
 		}
 	}
 </script>

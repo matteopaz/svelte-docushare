@@ -1,7 +1,22 @@
 <script context="module" lang="ts">
 	// @ts-ignore
+	import { browser } from '$app/env';
 	import { API_URL } from '/src/global.d';
 	export async function load({ fetch, session }) {
+		if(fetch) {
+			console.log(`fetch exists, server? ${!browser}`);
+			if(!browser) {
+				const fetcher = await fetch(`${API_URL}/ping`);
+				console.log(fetcher);
+				if(fetcher.ok) {
+					console.log("fetch worked on server!");
+				} else {
+					console.log("fetch failed on server");
+				}
+			}
+		} else {
+			console.log(`fetch does not exist, server? ${!browser}`)
+		}
 		if (session.loggedIn) {
 			const fetcher = await fetch(`${API_URL}/user-docs/10`, {
 				headers: {
