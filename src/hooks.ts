@@ -1,5 +1,5 @@
 import { API_URL } from './global.d';
-const AUTH_COOKIE_DOMAIN = '.matteodev.workers.dev'; // Switch if ever needed, based on the domain of the Auth cookie from the API
+const AUTH_COOKIE_DOMAIN = '127.0.0.1'; // Switch if ever needed, based on the domain of the Auth cookie from the API
 
 function parseCookies(cookieString: string): { [key: string]: any } {
 	// Parse req.headers.cookie into an object

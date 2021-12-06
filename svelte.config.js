@@ -1,25 +1,6 @@
 import preprocess from 'svelte-preprocess';
 import adapterCFW from '@sveltejs/adapter-cloudflare-workers';
 import { defineConfig, searchForWorkspaceRoot } from 'vite';
-const viteConfig = defineConfig(() => {
-    return {
-        optimizeDeps: {
-            include: ["@toast-ui/editor"], // Probably not needed but if it aint broke DONT FIX IT
-        },
-        server: {
-            hmr: {
-                port: 3000,
-                host: "localhost",
-                open: true
-            },
-            fs: {
-                allow: [
-                    searchForWorkspaceRoot(process.cwd())
-                ]
-            }
-        }
-    }
-});
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -43,9 +24,25 @@ const config = {
             }
         }),
         target: '#svelte',
-        vite: () => {
-            return viteConfig;
-        },
+        vite: defineConfig(() => {
+            return {
+                optimizeDeps: {
+                    include: ["@toast-ui/editor"], // Probably not needed but if it aint broke DONT FIX IT
+                },
+                server: {
+                    hmr: {
+                        port: 3000,
+                        host: "localhost",
+                        open: true
+                    },
+                    fs: {
+                        allow: [
+                            searchForWorkspaceRoot(process.cwd())
+                        ]
+                    }
+                }
+            }
+        })
     },
 
 }

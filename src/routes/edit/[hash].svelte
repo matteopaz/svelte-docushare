@@ -65,24 +65,21 @@
 		owned: '',
 		created: new Date()
 	};
-	let savestate: 'Unsaved' | 'Saved locally' | 'Saved to cloud' = 'Saved locally';
+	let charLength = 0;
+	let statusText: 'Document too long (Unsaved)' | 'Unsaved' | 'Saved locally' | 'Saved to cloud' = 'Saved locally';
 	let EditorClass;
 	let editor;
 	let modalopen = false;
 	let save = () => {
 		// Local save function
 		if (!editor) return;
-		const content = editor.getMarkdown();
-		doc.content = content;
 		localStorage.setItem('doc-cache', JSON.stringify(doc));
-		savestate = 'Saved locally';
+		statusText = 'Saved locally';
 		console.log('Saved locally.');
 	};
 	let apiSave = () => {
 		// Cloud save function
 		if (!editor) return;
-		const content = editor.getMarkdown();
-		doc.content = content;
 		fetch(`${API_URL}/save/${hash}`, {
 			method: 'POST',
 			headers: {
@@ -91,13 +88,21 @@
 			},
 			body: JSON.stringify(doc)
 		});
-		savestate = 'Saved to cloud';
+		statusText = 'Saved to cloud';
 		console.log('Saved to cloud.');
 	};
 	const debouncedSave = debounce(save, 5000);
 	const debouncedApiSave = debounce(apiSave, 30000);
 	const changeAction = () => {
-		savestate = 'Unsaved';
+		const content = editor.getMarkdown();
+		doc.content = content;
+		charLength = content.length;
+		if(charLength >= 40000) {
+			statusText = 'Document too long (Unsaved)';
+			return;
+		} else {
+			statusText = 'Unsaved';
+		}
 		debouncedSave();
 		debouncedApiSave();
 	};
@@ -132,7 +137,7 @@
 		apiSave();
 	}
 	function handleClosing(event) {
-		if (savestate === 'Unsaved') {
+		if (statusText === 'Unsaved' || statusText === 'Document too long (Unsaved)') {
 			const warning = 'You have unsaved content, please save or you will lose it!';
 			event.returnValue = warning;
 			return warning;
@@ -142,7 +147,7 @@
 	}
 	$: {
 		const nav = $navigating;
-		if (nav && savestate === 'Unsaved') {
+		if (nav && (statusText === 'Unsaved' || statusText === 'Document too long (Unsaved)')) {
 			goto(`/edit/${hash}`);
 			const accepted = confirm(
 				'You have unsaved content, if you continue at this time you will lose it.'
@@ -166,6 +171,9 @@
 			<button
 				class="btn btn-secondary"
 				on:click={() => {
+					if(charLength >= 40000) {
+						return;
+					}
 					save();
 					apiSave();
 				}}>Save Document</button
@@ -181,7 +189,7 @@
 				<input type="text" name="title" bind:value={doc.title} on:keydown={changeAction} />
 			</label>
 			<p class="info">
-				<span id="save-status">{savestate}</span>
+				<span id="save-status">{statusText}</span>
 				<span class="statistic"> Owned by: {doc.owned} </span>
 				<span class="statistic"> Viewed {doc.viewed} times </span>
 				<span class="statistic">
@@ -907,6 +915,7 @@
 			}
 		</style>
 		<div id="editor" spellcheck="false" />
+		<span class="characters-left" class:red={((40000 - charLength) <= 0)} >{(40000 - charLength) <= 5000 ? 40000 - charLength : ""}</span>
 	</section>
 	{#if modalopen}
 		<Modal
@@ -939,6 +948,11 @@
 {/if}
 
 <style lang="scss">
+
+	.characters-left {
+		font-size: clamp(0.8rem, 1vw, 1.33rem);
+		letter-spacing: 0.15rem;
+	}
 	.center {
 		height: var(--page-height);
 	}

@@ -109,3 +109,7 @@ textarea::placeholder {
     display: grid;
     place-items: center;
 }
+
+.red {
+    color: #ff1211;
+}
