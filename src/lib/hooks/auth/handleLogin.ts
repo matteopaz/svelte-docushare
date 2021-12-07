@@ -24,10 +24,16 @@ export default async function handleLogin(login: AuthenticationForm): Promise<bo
 		})
 	});
 	if (fetcher.status === 200) {
-		const user = await fetcher.text();
+		const token = await fetcher.text();
+		let parts: any[] = token.split(".");
+		// Parse parts[0] from base64 to string to JSON
+		parts[1] = atob(parts[1]);
+		parts[1] = JSON.parse(parts[1]);
+
 		session.update(current => {
 			current.loggedIn = true;
-			current.user = user;
+			current.user = parts[1].user;
+			current.jwt = token;
 			return current;
 		});
 	} else {
