@@ -13,6 +13,7 @@
 	import { API_URL } from '/src/global.d';
 	import { title } from '$lib/stores';
 	import { goto } from '$app/navigation';
+	import { browser } from '$app/env';
 	import { session } from '$app/stores';
 	title.set('Creating Doc...');
 	let status = {
@@ -33,7 +34,7 @@
 		if (fetcher.ok) {
 			const res = await fetcher.json();
 			setTimeout(() => {
-				goto(`/edit/${res.__hash}`);
+				if(browser) goto(`/edit/${res.__hash}`);
 			}, 300);
 		} else {
 			let text = 'Error creating new document. Try logging back in or reloading.';

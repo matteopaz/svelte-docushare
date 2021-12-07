@@ -8,8 +8,8 @@
 				headers: {
 					Authentication: session.jwt
 				}
-			});
-			if (fetched_data.ok) {
+			}).catch(console.warn);
+			if (fetched_data && fetched_data.ok) {
 				const cloud_document = await fetched_data.json();
 				return {
 					props: {
@@ -137,7 +137,7 @@
 		apiSave();
 	}
 	function handleClosing(event) {
-		if (statusText === 'Unsaved' || statusText === 'Document too long (Unsaved)') {
+		if (statusText !== "Saved to cloud") {
 			const warning = 'You have unsaved content, please save or you will lose it!';
 			event.returnValue = warning;
 			return warning;
@@ -147,7 +147,7 @@
 	}
 	$: {
 		const nav = $navigating;
-		if (nav && (statusText === 'Unsaved' || statusText === 'Document too long (Unsaved)')) {
+		if (nav && statusText !== "Saved to cloud") {
 			goto(`/edit/${hash}`);
 			const accepted = confirm(
 				'You have unsaved content, if you continue at this time you will lose it.'
@@ -915,6 +915,7 @@
 			}
 		</style>
 		<div id="editor" spellcheck="false" />
+		<p class="share">Here is your public view link: <a href="/view/{hash}" target="_blank">{window.location.origin + "/view/" + hash}</a></p>
 		<span class="characters-left" class:red={((40000 - charLength) <= 0)} >{(40000 - charLength) <= 5000 ? 40000 - charLength : ""}</span>
 	</section>
 	{#if modalopen}
@@ -949,6 +950,11 @@
 
 <style lang="scss">
 
+	.share {
+		margin: 0.5rem auto;
+		width: max-content;
+		font-size: clamp(1rem, 1.15vw, 1.35rem);
+	}
 	.characters-left {
 		font-size: clamp(0.8rem, 1vw, 1.33rem);
 		letter-spacing: 0.15rem;

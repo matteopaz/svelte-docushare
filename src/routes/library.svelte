@@ -1,24 +1,31 @@
 <script context="module" lang="ts">
 	import { browser } from '$app/env';
+	import handleLogout from '$lib/hooks/auth/handleLogout';
 	// @ts-expect-error
 	import { API_URL } from '/src/global.d';
 	export async function load({ fetch, session }) {
-		console.log(JSON.stringify(fetch, session));
-		if (fetch) {
-			console.log('fetch exists');
-		}
 		if (session.loggedIn) {
 			const fetched_documents = await fetch(`${API_URL}/user-docs/100`, {
 				headers: {
 					Authentication: session.jwt
 				}
-			});
+			}).catch(console.warn);
+			if(fetched_documents && fetched_documents.ok) {
 			return {
 				props: {
 					documents: await fetched_documents.json()
 				}
 			};
+		} else if(fetched_documents) {
+			const text = await fetched_documents.text();
+			if(text === "Not Authorized") {
+				handleLogout();
+			}
+			return {};
+		} else {
+			return {};
 		}
+	} else return {};
 	}
 </script>
 

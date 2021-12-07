@@ -6,9 +6,8 @@
 		if(fetch) {
 			console.log(`fetch exists, server? ${!browser}`);
 			if(!browser) {
-				const fetcher = await fetch(`${API_URL}/ping`);
-				console.log(fetcher);
-				if(fetcher.ok) {
+				const fetcher = await fetch(`${API_URL}/ping`).catch(console.warn);
+				if(fetcher && fetcher.ok) {
 					console.log("fetch worked on server!");
 				} else {
 					console.log("fetch failed on server");
@@ -22,8 +21,8 @@
 				headers: {
 					Authentication: session.jwt
 				}
-			});
-			if (fetcher.ok) {
+			}).catch(console.warn)
+			if (fetcher && fetcher.ok) {
 				return {
 					props: {
 						documents: await fetcher.json()

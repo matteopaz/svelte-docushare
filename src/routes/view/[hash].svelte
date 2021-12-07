@@ -3,8 +3,8 @@
 	import { API_URL } from '/src/global.d';
 	export async function load({ page, fetch }) {
 		const hash = page.params.hash;
-		const fetcher: Response = await fetch(`${API_URL}/view/${hash}`);
-		if (fetcher.ok) {
+		const fetcher: Response = await fetch(`${API_URL}/view/${hash}`).catch(console.warn);
+		if (fetcher && fetcher.ok) {
 			const res = await fetcher.json();
 			return {
 				props: {
