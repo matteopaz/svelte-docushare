@@ -1,5 +1,5 @@
 /// <reference types="@sveltejs/kit" />
-export const API_URL = `https://docushare-api.matteopaz.me`;
+export const API_URL = `https://docushare.matteopaz.me/api`;
 export interface AuthenticationForm {
     email: string,
     password: string,
