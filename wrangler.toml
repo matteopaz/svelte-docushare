@@ -1,4 +1,4 @@
-name = "docushare-lite-dev"
+name = "docushare-dev"
 type = "javascript"
 route = ''
 zone_id = ''
@@ -17,7 +17,7 @@ bucket = './build'
 entry-point = './workers-site'
 
 [env.production]
-name = "docushare-lite"
+name = "docushare"
 workers_dev = false
 route = "docushare.matteopaz.me/*"
 zone_id = "f0751e95ee874a4ca5479cd279b7b12b"
