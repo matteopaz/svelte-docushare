@@ -1,4 +1,5 @@
 <script lang="ts" context="module">
+	import { browser } from '$app/env';
 	// @ts-expect-error
 	import { API_URL } from '/src/global.d';
 	export async function load({ page, fetch }) {
@@ -15,6 +16,7 @@
 				maxage: 60 * 60 * 24 * 1.5 // 36hr cache
 			};
 		} else {
+			if(!browser) return {} // Do not redirect if it is just a server fetch failure
 			return {
 				redirect: '/view/',
 				status: 303
