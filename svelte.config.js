@@ -9,8 +9,8 @@ const config = {
     preprocess: preprocess({
         postcss: true,
     }),
-
     kit: {
+        ssr: false,
         files: {
             assets: "public"
         },
