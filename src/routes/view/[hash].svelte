@@ -34,7 +34,7 @@
 	export let title: string;
 	export let created: Date;
 	HeadTitle.set(title);
-	const readableDate = created.toLocaleString('en-US', {
+	const readableDate = created?.toLocaleString('en-US', {
 		year: 'numeric',
 		month: 'long',
 		day: 'numeric'
@@ -43,7 +43,7 @@
 		xhtmlOut: true,
 		breaks: true
 	});
-	const renderedContent = md.render(content);
+	const renderedContent = md.render(content ?? '');
 	const safeContent = sanitizeHtml(renderedContent);
 </script>
 
