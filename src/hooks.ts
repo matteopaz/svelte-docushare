@@ -34,10 +34,11 @@ export async function handle({ request, resolve }) {
 		if (cookies.Logout) {
 			const resolvedRequest = await resolve(request);
             request.locals.cookie = "";
+			const splitBySchema = DEPLOY_URL.split('//');
 			return {
 				...resolvedRequest,
 				headers: {
-					'set-cookie': [`Logout=no;Max-Age=0', 'Authentication=invalid;Max-Age=0;Domain=${DEPLOY_URL};Path=/;`],
+					'set-cookie': [`Logout=no;Max-Age=0;Domain=${splitBySchema[splitBySchema.length - 1]};`, `Authentication=invalid;Max-Age=0;Domain=${splitBySchema[splitBySchema.length - 1]};Path=/;`],
                     'content-type': 'text/html'
 				}
 			};

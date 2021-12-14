@@ -17,7 +17,7 @@ export default async function handleLogin(login: AuthenticationForm): Promise<bo
 		headers: {
 			'Content-Type': 'application/json',
 		},
-		credentials: 'include',
+		credentials: 'same-origin',
 		body: JSON.stringify({
 			email: login.email,
 			password: login.password
