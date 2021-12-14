@@ -1,5 +1,4 @@
-import { API_URL } from './global.d';
-const AUTH_COOKIE_DOMAIN = '127.0.0.1'; // Switch if ever needed, based on the domain of the Auth cookie from the API
+import { API_URL, DEPLOY_URL } from './global.d';
 
 function parseCookies(cookieString: string): { [key: string]: any } {
 	// Parse req.headers.cookie into an object
@@ -38,7 +37,7 @@ export async function handle({ request, resolve }) {
 			return {
 				...resolvedRequest,
 				headers: {
-					'set-cookie': ['Logout=no;Max-Age=0', 'Authentication=invalid;Max-Age=0;Domain=.matteodev.workers.dev;Path=/;'],
+					'set-cookie': [`Logout=no;Max-Age=0', 'Authentication=invalid;Max-Age=0;Domain=${DEPLOY_URL};Path=/;`],
                     'content-type': 'text/html'
 				}
 			};
