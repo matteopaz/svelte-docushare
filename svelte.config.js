@@ -10,7 +10,6 @@ const config = {
         postcss: true,
     }),
     kit: {
-        ssr: false,
         files: {
             assets: "public"
         },

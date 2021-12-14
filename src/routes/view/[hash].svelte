@@ -1,4 +1,5 @@
 <script lang="ts" context="module">
+	export const ssr = false;
 	import { browser } from '$app/env';
 	// @ts-expect-error
 	import { API_URL } from '/src/global.d';
