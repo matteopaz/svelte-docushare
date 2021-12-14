@@ -145,6 +145,13 @@
 			return true;
 		}
 	}
+	function handleKeydown(event) {
+		// Read the key pressed from the event
+		// If it is ctrl, then run changeAction
+		if (event.key.toLowerCase() === 'control' || event.key.toLowerCase() === 'ctrl') {
+			changeAction();
+		}
+	}
 	$: {
 		const nav = $navigating;
 		if (nav && statusText !== "Saved to cloud") {
@@ -160,11 +167,12 @@
 	$: {
 		title.set(doc.title !== '' ? doc.title : 'Document');
 	}
+
 </script>
 
 <Navigation blur={modalopen} />
 
-<svelte:window on:beforeunload={handleClosing} />
+<svelte:window on:beforeunload={handleClosing} on:keydown={handleKeydown} />
 {#if allowed === 'allowed'}
 	<section class="main-wrapper" class:blur={modalopen}>
 		<div class="control-bar">

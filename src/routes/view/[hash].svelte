@@ -420,7 +420,7 @@
 		max-width: clamp(70rem, 50vw, 90rem);
 		box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
 		margin: 0 auto;
-		background-color: var(--offwhite);
+		background-color: #fff;
 		min-height: var(--page-height);
 		padding: clamp(3rem, 4vw, 4.5rem);
 		font-size: clamp(1.75rem, calc(20 * calc(100vw / 1920)), 2.5rem);
