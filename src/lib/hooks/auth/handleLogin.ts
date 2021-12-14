@@ -33,7 +33,7 @@ export default async function handleLogin(login: AuthenticationForm): Promise<bo
 		session.update(current => {
 			current.loggedIn = true;
 			current.user = parts[1].user;
-			current.jwt = token;
+			current.jwt = "Bearer " + token;
 			return current;
 		});
 	} else {
