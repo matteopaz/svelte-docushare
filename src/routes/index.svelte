@@ -79,7 +79,6 @@
 		signup = signup;
 	}
 </script>
-
 <Navigation
 	on:signup={() => (modalActive.signup = true)}
 	on:login={() => (modalActive.login = true)}
