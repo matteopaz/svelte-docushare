@@ -60,13 +60,14 @@
 		const writer = new Typewriter(header, 195, '|');
 		writer
 			.init()
+			.wait(5000)
+			.delete(9)
+			.wait(1500)
 			.defineLoopStart()
 			.write('Docushare')
-			.put('<br />', 'html')
-			.write('Lite')
-			.wait(19000)
+			.wait(16000)
 			.delete(true)
-			.wait(1100)
+			.wait(1500)
 			.defineLoopEnd();
 		loaded = true;
 	});
@@ -88,12 +89,10 @@
 <main class:blur={modalActive.signup || modalActive.login}>
 	<section class="hero-container">
 		<h1 class="hero knockout" class:unload={!loaded}>
-			<span bind:this={header} />
-			<span class="placeholder">Docushare Lite</span>
+			<span bind:this={header}>Docushare</span>
 		</h1>
 		<h2 class="hero">
-			Markdown and text document sharing platform. Create, share and manage files for free, hosted
-			online.
+			Markdown and text document sharing platform. Create, share and manage files for free, hosted online.
 		</h2>
 		<div class="stripe" class:unload={!loaded} />
 		<div class="utilities-container">
