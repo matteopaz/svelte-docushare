@@ -29,7 +29,7 @@
 </script>
 
 <svelte:head>
-	<script src="https://kit.fontawesome.com/747d2e26f4.js" crossorigin="anonymous"></script>
+	<script src="https://kit.fontawesome.com/747d2e26f4.js" crossorigin="anonymous" defer></script>
 </svelte:head>
 
 <ol class="doclist" style="max-height: {maxh}rem">
@@ -50,6 +50,7 @@
 								on:click={() => {
 									confirmstate[index] = !confirmstate[index];
 								}}
+								aria-label="Delete"
 								class:red={confirmstate[index]}
 							>
 								<i class="far fa-trash-alt delete" />
